@@ -1,9 +1,285 @@
 <!doctype html>
-<html>
-  <head><meta charset="utf-8"><title>IG Grid</title></head>
-  <body>
-    <h1>IG Grid Widget</h1>
-    <p>Health: <a href="/api/health">/api/health</a></p>
-    <p>Grid (modo global): <a href="/api/grid">/api/grid</a></p>
-  </body>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Instagram Grid — Demo UI</title>
+  <meta name="description" content="Vista de Grid conectada a Notion" />
+  <style>
+    :root{
+      --bg:#0b0b0c;
+      --card:#141417;
+      --muted:#a1a1aa;
+      --text:#fafaf9;
+      --accent:#86efac;
+      --accent-ink:#052e16;
+      --ring:#26262b;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:linear-gradient(180deg,#0b0b0c 0%,#121217 100%);
+      color:var(--text); font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Ubuntu,"Helvetica Neue",Arial;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:1100px; margin:0 auto; padding:28px 16px 80px}
+    header{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px}
+    .brand{display:flex; align-items:center; gap:10px}
+    .dot{width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 20px #22c55e66}
+    h1{font-size:20px; margin:0}
+    .links{display:flex; gap:8px; flex-wrap:wrap}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:999px; background:#1a1a1f; border:1px solid var(--ring);
+    }
+    .pill:hover{background:#1e1e24}
+    .muted{color:var(--muted)}
+    .grid{
+      display:grid; gap:14px;
+      grid-template-columns:repeat(1,minmax(0,1fr));
+    }
+    @media (min-width:560px){ .grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+    @media (min-width:900px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr));} }
+    .card{
+      background:var(--card); border:1px solid var(--ring); border-radius:16px; overflow:hidden;
+      display:flex; flex-direction:column; min-height:100%;
+      transition:transform .15s ease, border-color .15s ease;
+    }
+    .card:hover{transform:translateY(-2px); border-color:#2f2f37}
+    .media{position:relative; aspect-ratio:1/1; overflow:hidden; background:#0e0e12}
+    .media img, .media video{
+      width:100%; height:100%; object-fit:cover; display:block; opacity:0; transition:opacity .3s ease;
+    }
+    .media.loaded img, .media.loaded video{opacity:1}
+    .badge{
+      position:absolute; top:10px; left:10px; font-size:11px; letter-spacing:.2px;
+      padding:6px 8px; border-radius:999px; background:#00000066; backdrop-filter: blur(6px);
+      border:1px solid #ffffff22;
+    }
+    .content{padding:14px 14px 12px}
+    .title{font-weight:600; font-size:15px; margin:0 0 6px}
+    .caption{color:var(--muted); font-size:13px; margin:0 0 12px; white-space:pre-line}
+    .actions{display:flex; gap:8px}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 12px; border-radius:12px; border:1px solid var(--ring); background:#1a1a1f; cursor:pointer;
+      transition:background .15s ease, transform .05s ease;
+    }
+    .btn:hover{background:#202028}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:600}
+    .btn.primary:hover{filter:brightness(.98)}
+    .skeleton{
+      border-radius:12px; overflow:hidden; background:var(--card); border:1px solid var(--ring);
+      animation:pulse 1.3s ease-in-out infinite;
+      aspect-ratio:1/1;
+    }
+    @keyframes pulse{
+      0%{opacity:.6} 50%{opacity:.3} 100%{opacity:.6}
+    }
+    footer{margin-top:28px; color:var(--muted); font-size:12px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap}
+    .error{
+      margin:18px 0; padding:12px 14px; border-radius:12px; border:1px solid #7f1d1d; background:#451a1a; color:#fecaca; font-size:13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <span class="dot" aria-hidden="true"></span>
+        <h1>Grid conectado a Notion</h1>
+      </div>
+      <nav class="links">
+        <a class="pill" href="/"><span>←</span> Portada</a>
+        <a class="pill" href="/api/grid" target="_blank">Ver JSON</a>
+      </nav>
+    </header>
+
+    <p class="muted" id="meta">Cargando…</p>
+
+    <!-- Loading placeholders -->
+    <div class="grid" id="grid">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+
+    <div id="error" class="error" style="display:none"></div>
+
+    <footer>
+      <span>© 2025 Flujo Creativo · Demo UX</span>
+      <span><a class="muted" href="/api/health" target="_blank">/api/health</a></span>
+    </footer>
+  </div>
+
+  <script>
+    // Utilidad: toma el primer link válido de 'href' (puede venir con saltos de línea)
+    function normalizeHref(href) {
+      if (!href) return null;
+      const first = String(href).split(/\s+/).find(Boolean);
+      try {
+        // Si no es URL válida, dejarla en null
+        new URL(first);
+        return first;
+      } catch {
+        return null;
+      }
+    }
+
+    // Detecta si la media parece ser video .mp4
+    function isVideo(url) {
+      if (!url) return false;
+      try {
+        const u = new URL(url);
+        return u.pathname.toLowerCase().endsWith(".mp4");
+      } catch { return false; }
+    }
+
+    // Lazy-load con IntersectionObserver
+    const io = 'IntersectionObserver' in window ? new IntersectionObserver(entries=>{
+      entries.forEach(e=>{
+        if (e.isIntersecting){
+          const el = e.target;
+          const src = el.getAttribute('data-src');
+          if (src){
+            if (el.tagName === 'IMG' || el.tagName === 'VIDEO'){
+              el.src = src;
+              if (el.tagName === 'VIDEO') {
+                el.addEventListener('loadeddata', ()=> el.closest('.media').classList.add('loaded'), {once:true});
+              } else {
+                el.addEventListener('load', ()=> el.closest('.media').classList.add('loaded'), {once:true});
+              }
+            }
+            el.removeAttribute('data-src');
+          }
+          io.unobserve(el);
+        }
+      });
+    }, {rootMargin:"200px"}) : null;
+
+    function observe(el){
+      if (io) io.observe(el); else {
+        // Fallback sin IO: carga directa
+        const src = el.getAttribute('data-src');
+        if (src) el.src = src;
+      }
+    }
+
+    function cardTemplate(item){
+      const title = item.title || 'Sin título';
+      const caption = item.caption || '';
+      const mediaUrl = item.image || '';
+      const href = normalizeHref(item.href);
+      const mediaIsVideo = isVideo(mediaUrl);
+
+      const mediaId = 'm_' + (Math.random().toString(36).slice(2));
+      const badge = mediaIsVideo ? 'Video' : 'Imagen';
+
+      // Contenedor de tarjeta
+      const card = document.createElement('article');
+      card.className = 'card';
+
+      // Media
+      const media = document.createElement('div');
+      media.className = 'media';
+      media.innerHTML = `<span class="badge">${badge}</span>`;
+      if (mediaIsVideo){
+        const v = document.createElement('video');
+        v.setAttribute('playsinline','');
+        v.setAttribute('muted','');
+        v.setAttribute('loop','');
+        v.setAttribute('preload','metadata');
+        v.setAttribute('data-src', mediaUrl);
+        v.autoplay = false; // el hover/play manual depende del navegador
+        media.appendChild(v);
+        observe(v);
+      } else {
+        const img = document.createElement('img');
+        img.alt = title;
+        img.loading = 'lazy';
+        img.setAttribute('data-src', mediaUrl);
+        media.appendChild(img);
+        observe(img);
+      }
+
+      // Contenido
+      const content = document.createElement('div');
+      content.className = 'content';
+      const h3 = document.createElement('h3');
+      h3.className = 'title';
+      h3.textContent = title;
+      const p = document.createElement('p');
+      p.className = 'caption';
+      p.textContent = caption;
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      if (href){
+        const a = document.createElement('a');
+        a.className = 'btn primary';
+        a.href = href; a.target = '_blank'; a.rel = 'noopener';
+        a.textContent = 'Ver';
+        actions.appendChild(a);
+      }
+      const viewJson = document.createElement('button');
+      viewJson.className = 'btn';
+      viewJson.type = 'button';
+      viewJson.textContent = 'Detalles';
+      viewJson.addEventListener('click', ()=> {
+        alert(JSON.stringify(item, null, 2));
+      });
+      actions.appendChild(viewJson);
+
+      content.appendChild(h3);
+      if (caption) content.appendChild(p);
+      content.appendChild(actions);
+
+      card.appendChild(media);
+      card.appendChild(content);
+      return card;
+    }
+
+    async function loadGrid(){
+      const meta = document.getElementById('meta');
+      const grid = document.getElementById('grid');
+      const error = document.getElementById('error');
+
+      meta.textContent = 'Cargando posts desde /api/grid…';
+
+      try{
+        const res = await fetch('/api/grid', { headers: { 'accept': 'application/json' } });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        meta.textContent = `Se encontraron ${data.count ?? (data.items?.length||0)} items · usingClient=${!!data.usingClient}`;
+        grid.innerHTML = ''; // limpiar skeletons
+
+        const items = Array.isArray(data.items) ? data.items : [];
+        if (!items.length){
+          meta.textContent = 'No hay items para mostrar.';
+          return;
+        }
+
+        items.forEach(item=>{
+          try{
+            grid.appendChild(cardTemplate(item));
+          } catch(e){
+            console.warn('Item inválido', e, item);
+          }
+        });
+      } catch (e){
+        console.error(e);
+        error.style.display = '';
+        error.textContent = 'No se pudo cargar /api/grid. Revisa la consola o tu API.';
+        meta.textContent = 'Error al cargar.';
+      }
+    }
+
+    loadGrid();
+  </script>
+</body>
 </html>
