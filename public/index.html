@@ -2,59 +2,39 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
+  <title>Notion Grid – Demo</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Notion Grid — Demo</title>
-  <style>
-    :root { color-scheme: light dark; }
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
-                   'Helvetica Neue', Arial, sans-serif;
-      margin: 0; padding: 32px; line-height: 1.5;
-    }
-    .wrap { max-width: 880px; margin: 0 auto; }
-    h1 { font-size: 22px; margin: 0 0 8px; }
-    nav a { margin-right: 12px; text-decoration: none; }
-    pre { background: #f6f6f6; color: #222; padding: 16px; border-radius: 10px; overflow: auto; }
-    code.k { color: #6a00ff; font-weight: 600; }
-    @media (prefers-color-scheme: dark) {
-      pre { background: #1c1c1c; color: #ddd; }
-    }
-    .mini { color: #666; font-size: 12px; margin-top: 28px; }
-    .steps li { margin: 6px 0; }
-  </style>
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <div class="wrap">
-    <h1>STATIC OK</h1>
-    <p>Bienvenido 👋 Esta es la página de prueba del sistema de widgets <strong>Notion Grid</strong>.</p>
+  <div class="container">
+    <header>
+      <div class="hstack">
+        <div class="brand">Flujo Creativo</div>
+        <div class="badge">Notion Grid (demo)</div>
+      </div>
+      <nav class="hstack">
+        <a class="btn ghost" href="/grid.html">Ver Grid</a>
+        <a class="btn primary" href="/activate.html">Activar Widget</a>
+      </nav>
+    </header>
 
-    <nav>
-      <a href="/api/health">/api/health</a> ·
-      <a href="/api/grid">/api/grid</a> ·
-      <a href="/activate.html">Activar Widget</a> ·
-      <a href="/grid.html">Ver Grid</a>
-    </nav>
+    <div class="card vstack">
+      <h1>Bienvenido 👋</h1>
+      <p>Este es el demo funcional del sistema de widgets Notion Grid.</p>
+      <p>Flujo sugerido:</p>
+      <ol>
+        <li>Entra a <strong>Activar Widget</strong> y genera tu <em>Magic Link</em>.</li>
+        <li>En la página <strong>Success</strong> verás el link en dos lugares y podrás ir al Setup.</li>
+        <li>Completa el <strong>Wizard</strong> (conectar datos, personalizar, preview, publish).</li>
+      </ol>
+      <div class="hstack" style="margin-top:8px">
+        <a class="btn primary" href="/activate.html">Activar Widget</a>
+        <a class="btn" href="/grid.html">Ver Grid (demo)</a>
+      </div>
+    </div>
 
-    <h3>Instrucciones (incluidas dentro del código):</h3>
-    <ol class="steps">
-      <li>Copia/pega los archivos tal cual (respetando la carpeta <code>public/</code>).</li>
-      <li>Ejecuta <code class="k">npm i</code> y luego <code class="k">npm start</code>.</li>
-      <li>(Opcional) Para usar tu JSON real: crea <code>.env</code> desde <code>.env.example</code> y define
-          <code>NOTION_GRID_API_URL</code> con tu endpoint.</li>
-      <li>Abre <code>/grid.html</code> para ver el feed con tus datos.</li>
-    </ol>
-
-    <p>Enlaces de prueba:</p>
-    <ul>
-      <li><strong>/api/health</strong>: verifica variables de entorno.</li>
-      <li><strong>/api/grid</strong>: obtiene los posts (proxy si usas <code>NOTION_GRID_API_URL</code>, o demo).</li>
-      <li><strong>Activar Widget</strong>: formulario de prueba para generar un Magic Link.</li>
-      <li><strong>Ver Grid</strong>: interfaz visual del feed de Instagram.</li>
-    </ul>
-
-    <pre><code>© 2025 Flujo Creativo · Sistema Notion Grid (demo UX)</code></pre>
-
-    <p class="mini">Tip: estáticos se sirven antes que el API. Así <code>/grid.html</code> nunca colisiona con <code>/api/grid</code>.</p>
+    <footer>© 2025 Flujo Creativo · Sistema Notion Grid</footer>
   </div>
 </body>
 </html>
