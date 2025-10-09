@@ -5,7 +5,19 @@
   <title>STATIC OK</title>
   <body>
     <h1>STATIC OK</h1>
-    <p><a href="/api/health">/api/health</a></p>
-    <p><a href="/api/grid">/api/grid</a></p>
+    <p><a href="/public/activate.html">Activar Widget</a></p>
+    <p><a href="/api/health">/api/health</a> · <a href="/api/grid">/api/grid</a></p>
+    <pre id="out"></pre>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const token = params.get('token');
+      const url = token ? `/api/grid?token=${encodeURIComponent(token)}` : '/api/grid';
+      document.getElementById('out').textContent = 'Cargando ' + url + '...';
+      fetch(url).then(r=>r.json()).then(j=>{
+        document.getElementById('out').textContent = JSON.stringify(j, null, 2);
+      }).catch(e=>{
+        document.getElementById('out').textContent = 'Error: ' + String(e);
+      });
+    </script>
   </body>
 </html>
