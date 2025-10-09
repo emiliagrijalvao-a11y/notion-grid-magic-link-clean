@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Widget Setup Wizard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="hstack">
+        <a class="brand" href="/">← Flujo Creativo</a>
+        <div class="badge">Setup Wizard</div>
+      </div>
+    </header>
+
+    <div class="card vstack">
+      <div class="stepper">
+        <span class="step active" data-step="1">1) Conectar datos</span>
+        <span class="step" data-step="2">2) Personalizar</span>
+        <span class="step" data-step="3">3) Preview</span>
+        <span class="step" data-step="4">4) Publish</span>
+      </div>
+
+      <!-- Paso 1 -->
+      <section data-pane="1" class="vstack">
+        <h2>Conectar datos</h2>
+        <p>Pega la URL de tu endpoint que devuelve el JSON del grid. Si lo dejas vacío, usarás el demo.</p>
+        <input id="upstreamUrl" class="input" type="url" placeholder="https://TU-ENDPOINT/api/grid" />
+        <div class="hstack">
+          <button id="saveP1" class="btn primary">Guardar y continuar →</button>
+          <button id="skipP1" class="btn ghost">Usar demo y continuar</button>
+        </div>
+      </section>
+
+      <!-- Paso 2 -->
+      <section data-pane="2" class="vstack" style="display:none">
+        <h2>Personalizar</h2>
+        <div class="hstack">
+          <label class="kbd">Columns: <input id="optCols" type="number" min="1" max="6" value="3" class="input" style="width:90px" /></label>
+          <label class="kbd">Gap (px): <input id="optGap" type="number" min="0" max="40" value="10" class="input" style="width:90px" /></label>
+          <label class="kbd">Open links: 
+            <select id="optTarget" class="input" style="width:160px">
+              <option value="_blank" selected>Nueva pestaña</option>
+              <option value="_self">Misma pestaña</option>
+            </select>
+          </label>
+        </div>
+        <div class="hstack">
+          <button id="saveP2" class="btn primary">Guardar y continuar →</button>
+          <button id="backP2" class="btn ghost">← Volver</button>
+        </div>
+      </section>
+
+      <!-- Paso 3 -->
+      <section data-pane="3" class="vstack" style="display:none">
+        <h2>Preview</h2>
+        <p>Esto carga <code class="inline">/api/widgets/:token/grid</code> (si no definiste datos, verás el demo).</p>
+        <div id="preview" class="grid"></div>
+        <div class="hstack" style="margin-top:8px">
+          <button id="reloadPrev" class="btn">Recargar</button>
+          <button id="nextP3" class="btn primary">Continuar →</button>
+          <button id="backP3" class="btn ghost">← Volver</button>
+        </div>
+      </section>
+
+      <!-- Paso 4 -->
+      <section data-pane="4" class="vstack" style="display:none">
+        <h2>Publish (snippet)</h2>
+        <p>Inserta este snippet en tu web donde quieras que aparezca el grid:</p>
+        <pre id="snippet"></pre>
+        <div class="hstack">
+          <button id="copySnip" class="btn copy">Copiar</button>
+          <a class="btn" href="/grid.html" target="_blank">Probar UI base</a>
+          <button id="backP4" class="btn ghost">← Volver</button>
+        </div>
+      </section>
+    </div>
+
+    <footer>© 2025 Flujo Creativo</footer>
+  </div>
+
+  <script type="module">
+    import { qs, qsa, getParam, copy } from "/js/utils.js";
+
+    const token = getParam("token");
+    if (!token) alert("Falta token en la URL");
+
+    // Navegación de pasos
+    function showStep(n) {
+      qsa("[data-pane]").forEach(el => el.style.display = el.getAttribute("data-pane") == n ? "flex" : "none");
+      qsa(".step").forEach(el => el.classList.toggle("active", el.getAttribute("data-step") == n));
+    }
+
+    // P1
+    const upstreamUrl = qs("#upstreamUrl");
+    qs("#saveP1").addEventListener("click", async () => {
+      await fetch(`/api/widgets/${encodeURIComponent(token)}/config`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ upstreamUrl: upstreamUrl.value.trim() || null })
+      });
+      showStep(2);
+    });
+    qs("#skipP1").addEventListener("click", () => showStep(2));
+
+    // P2
+    const optCols = qs("#optCols");
+    const optGap = qs("#optGap");
+    const optTarget = qs("#optTarget");
+    qs("#saveP2").addEventListener("click", async () => {
+      const settings = {
+        columns: Number(optCols.value || 3),
+        gap: Number(optGap.value || 10),
+        target: optTarget.value || "_blank",
+      };
+      await fetch(`/api/widgets/${encodeURIComponent(token)}/config`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ settings })
+      });
+      showStep(3); loadPreview();
+    });
+    qs("#backP2").addEventListener("click", () => showStep(1));
+
+    // P3
+    const prevEl = qs("#preview");
+    async function loadPreview() {
+      prevEl.innerHTML = "Cargando…";
+      const r = await fetch(`/api/widgets/${encodeURIComponent(token)}/grid`);
+      const j = await r.json();
+      const settings = { columns: Number(optCols.value || 3), gap: Number(optGap.value || 10), target: optTarget.value || "_blank" };
+
+      prevEl.style.gridTemplateColumns = `repeat(${settings.columns}, 1fr)`;
+      prevEl.style.gap = `${settings.gap}px`;
+      prevEl.innerHTML = j.items.map(it => (
+        `<a href="${it.href || '#'}" target="${settings.target}"><img src="${it.image}" alt="${(it.title||'').replace(/"/g,'&quot;')}" loading="lazy" /></a>`
+      )).join("");
+    }
+    qs("#reloadPrev").addEventListener("click", loadPreview);
+    qs("#nextP3").addEventListener("click", () => { buildSnippet(); showStep(4); });
+    qs("#backP3").addEventListener("click", () => showStep(2));
+
+    // P4 (snippet)
+    const snipEl = qs("#snippet");
+    const copySnip = qs("#copySnip");
+    function buildSnippet() {
+      const cols = Number(optCols.value || 3);
+      const gap = Number(optGap.value || 10);
+      const target = optTarget.value || "_blank";
+
+      const snippet =
+`<div id="notion-grid" data-token="${token}" data-columns="${cols}" data-gap="${gap}" data-target="${target}"></div>
+<script src="${location.origin}/widget-demo.js" defer></script>`;
+      snipEl.textContent = snippet;
+    }
+    copySnip.addEventListener("click", () => copy(snipEl.textContent, copySnip));
+
+    // Inicio
+    showStep(1);
+  </script>
+</body>
+</html>
