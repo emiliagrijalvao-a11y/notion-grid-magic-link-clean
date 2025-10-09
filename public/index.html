@@ -1,23 +1,83 @@
 <!doctype html>
 <html lang="es">
+<head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>STATIC OK</title>
-  <body>
-    <h1>STATIC OK</h1>
-    <p><a href="/public/activate.html">Activar Widget</a></p>
-    <p><a href="/api/health">/api/health</a> · <a href="/api/grid">/api/grid</a></p>
-    <pre id="out"></pre>
-    <script>
-      const params = new URLSearchParams(location.search);
-      const token = params.get('token');
-      const url = token ? `/api/grid?token=${encodeURIComponent(token)}` : '/api/grid';
-      document.getElementById('out').textContent = 'Cargando ' + url + '...';
-      fetch(url).then(r=>r.json()).then(j=>{
+  <style>
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: #f9fafb;
+      color: #111827;
+      padding: 40px;
+      max-width: 720px;
+      margin: auto;
+    }
+    h1 {
+      margin-bottom: 8px;
+    }
+    a {
+      color: #1d4ed8;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    pre {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px;
+      overflow-x: auto;
+      margin-top: 16px;
+    }
+    footer {
+      margin-top: 40px;
+      color: #6b7280;
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>STATIC OK</h1>
+  <p>Bienvenido 👋 Esta es la página de prueba del sistema de widgets Notion Grid.</p>
+
+  <p>
+    <a href="/api/health">/api/health</a> · 
+    <a href="/api/grid">/api/grid</a> · 
+    <a href="/public/activate.html">Activar Widget</a> · 
+    <a href="/public/grid.html">Ver Grid</a>
+  </p>
+
+  <p>Usa los enlaces de arriba para probar las funciones del sistema:</p>
+  <ul>
+    <li><strong>/api/health</strong>: verifica variables de entorno.</li>
+    <li><strong>/api/grid</strong>: obtiene los posts desde tu base de Notion.</li>
+    <li><strong>Activar Widget</strong>: formulario de prueba para generar un Magic Link.</li>
+    <li><strong>Ver Grid</strong>: interfaz visual del feed de Instagram.</li>
+  </ul>
+
+  <pre id="out"></pre>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    const url = token ? `/api/grid?token=${encodeURIComponent(token)}` : '/api/grid';
+    document.getElementById('out').textContent = 'Cargando ' + url + '...';
+
+    fetch(url)
+      .then(r => r.json())
+      .then(j => {
         document.getElementById('out').textContent = JSON.stringify(j, null, 2);
-      }).catch(e=>{
+      })
+      .catch(e => {
         document.getElementById('out').textContent = 'Error: ' + String(e);
       });
-    </script>
-  </body>
+  </script>
+
+  <footer>
+    <p>© 2025 Flujo Creativo · Sistema Notion Grid (demo UX)</p>
+  </footer>
+</body>
 </html>
