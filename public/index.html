@@ -2,39 +2,76 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Notion Grid – Demo</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="/styles.css" />
+  <title>Flujo Creativo · Notion Grid (demo)</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --beige:#D9D9D9;
+      --tile:#ECEBE8;
+      --black:#000000;
+      --white:#FFFFFF;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--beige); color:var(--black);
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    .wrap{max-width:920px; margin:0 auto; padding:48px 24px 80px}
+    header{display:flex; align-items:center; justify-content:space-between; margin-bottom:36px}
+    .brand{font-weight:800; letter-spacing:.2px}
+    .chip{font:600 12px/1 "Inter"; padding:6px 10px; border:1px solid var(--black); border-radius:999px}
+    .card{
+      background:var(--tile); border:1px solid var(--black);
+      border-radius:18px; padding:32px; box-shadow:4px 4px 0 var(--black)
+    }
+    h1{font:600 40px/1.1 "Oswald", sans-serif; margin:0 0 12px}
+    p{margin:0 0 10px; font-size:16px}
+    ul{margin:10px 0 0 20px}
+    .actions{display:flex; gap:12px; margin-top:22px}
+    .btn{
+      appearance:none; border:1px solid var(--black); background:var(--tile);
+      padding:12px 18px; font-weight:600; cursor:pointer; border-radius:10px
+    }
+    .btn--dark{background:var(--black); color:var(--white)}
+    footer{
+      margin-top:28px; display:flex; justify-content:space-between; font-size:12px;
+      opacity:.8
+    }
+    a{color:inherit}
+  </style>
 </head>
 <body>
-  <div class="container">
+  <div class="wrap">
     <header>
-      <div class="hstack">
-        <div class="brand">Flujo Creativo</div>
-        <div class="badge">Notion Grid (demo)</div>
-      </div>
-      <nav class="hstack">
-        <a class="btn ghost" href="/grid.html">Ver Grid</a>
-        <a class="btn primary" href="/activate.html">Activar Widget</a>
-      </nav>
+      <div class="brand">Flujo Creativo</div>
+      <div class="chip">Notion Grid (demo)</div>
     </header>
 
-    <div class="card vstack">
-      <h1>Bienvenido 👋</h1>
+    <section class="card">
+      <h1>Bienvenido </h1>
       <p>Este es el demo funcional del sistema de widgets Notion Grid.</p>
-      <p>Flujo sugerido:</p>
-      <ol>
-        <li>Entra a <strong>Activar Widget</strong> y genera tu <em>Magic Link</em>.</li>
-        <li>En la página <strong>Success</strong> verás el link en dos lugares y podrás ir al Setup.</li>
-        <li>Completa el <strong>Wizard</strong> (conectar datos, personalizar, preview, publish).</li>
-      </ol>
-      <div class="hstack" style="margin-top:8px">
-        <a class="btn primary" href="/activate.html">Activar Widget</a>
+      <ul>
+        <li>Genera un <em>Magic Link</em> (demo) y mira la página de “Success”.</li>
+        <li>Desde “Success” pasa al Setup.</li>
+      </ul>
+      <div class="actions">
         <a class="btn" href="/grid.html">Ver Grid (demo)</a>
+        <!-- Llévate a la página “Success” nueva (demo con token falso) -->
+        <a class="btn btn--dark" href="/success.html?token=DEMO123">Ir a Success →</a>
       </div>
-    </div>
+    </section>
 
-    <footer>© 2025 Flujo Creativo · Sistema Notion Grid</footer>
+    <footer>
+      <span>© 2025 Flujo Creativo · Sistema Notion Grid</span>
+      <a href="/success.html?token=DEMO123#help">¿Necesitas ayuda?</a>
+    </footer>
   </div>
 </body>
 </html>
