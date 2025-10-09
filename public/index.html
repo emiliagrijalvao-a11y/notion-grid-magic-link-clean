@@ -1,171 +1,321 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Flujo Creativo · Tu link de Setup</title>
+  <meta charset="utf-8" />
+  <title>Flujo Creativo · Notion Grid — Enlace de configuración</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Tipografías -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Fuentes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <style>
     :root{
-      --beige:#D9D9D9;     /* fondo */
-      --tile:#ECEBE8;      /* tarjetas / resaltados */
-      --black:#000000;
-      --white:#FFFFFF;
+      --bg: #D9D9D9;        /* beige amarillento (fondo) */
+      --tile: #ECEBE8;      /* cuadrados / resaltados */
+      --black: #000000;
+      --white: #ffffff;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; background:var(--beige); color:var(--black);
-      font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      margin:0;
+      background:var(--bg);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:var(--black);
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
     }
-    .wrap{max-width:760px; margin:0 auto; padding:48px 20px 96px}
-    header{display:flex; align-items:center; justify-content:space-between; margin-bottom:28px}
-    .brand{font-weight:800}
-    .home{
-      display:inline-flex; gap:8px; align-items:center; text-decoration:none;
-      color:inherit; border:1px solid var(--black); padding:8px 10px; border-radius:10px;
-      background:var(--tile)
+
+    .wrap{
+      min-height:100vh;
+      display:grid;
+      grid-template-rows:1fr auto;
     }
-    .arrow{width:14px;height:14px}
-    h1{font:600 40px/1.1 "Oswald",sans-serif; margin:12px 0}
-    .lead{max-width:65ch; margin:2px 0 18px; font-size:16px}
-    .panel{
-      background:var(--tile); border:1px solid var(--black); border-radius:18px;
-      padding:18px; display:flex; align-items:center; justify-content:space-between; gap:12px;
-      box-shadow:4px 4px 0 var(--black);
+
+    .container{
+      max-width:900px;
+      margin:0 auto;
+      padding:48px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
-    .url{
-      font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      overflow:auto; white-space:nowrap;
+
+    .card{
+      width:100%;
+      background:var(--white);
+      border:1px solid var(--black);
+      box-shadow:6px 6px 0 var(--black);
+      padding:28px;
     }
-    .actions{display:flex; gap:10px; margin-top:14px}
+
+    .eyebrow{
+      font-family:Oswald,Inter,sans-serif;
+      letter-spacing:.02em;
+      font-size:14px;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    h1{
+      font-family:Oswald,Inter,sans-serif;
+      font-size:clamp(28px,4.2vw,44px);
+      line-height:1.05;
+      margin:0 0 12px;
+    }
+
+    .sub{
+      font-size:15.5px;
+      line-height:1.5;
+      color:#222;
+      margin-bottom:20px;
+    }
+
+    .url-box{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      background:var(--bg);
+      border:1px solid var(--black);
+      padding:14px 14px;
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:14px;
+      overflow:auto;
+      white-space:nowrap;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
     .btn{
-      appearance:none; border:1px solid var(--black); background:var(--tile);
-      padding:12px 16px; font-weight:600; cursor:pointer; border-radius:10px
+      appearance:none;
+      border:1px solid var(--black);
+      background:var(--tile);
+      padding:10px 14px;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow:4px 4px 0 var(--black);
+      border-radius:0; /* bordes cuadrados */
     }
-    .btn--dark{background:var(--black); color:var(--white)}
-    footer{
-      margin-top:28px; display:flex; justify-content:space-between; align-items:center; gap:12px;
-      font-size:12px; opacity:.9
+    .btn:active{transform:translate(2px,2px); box-shadow:2px 2px 0 var(--black);}
+    .btn-primary{
+      background:var(--black);
+      color:var(--white);
     }
-    .help-toggle{cursor:pointer; text-decoration:underline}
-    /* Globo de ayuda */
-    .bubble{
-      position:fixed; right:18px; bottom:18px; width:min(520px, calc(100% - 36px));
-      background:var(--tile); border:1px solid var(--black); border-radius:18px;
-      padding:18px; box-shadow:6px 6px 0 var(--black); display:none; z-index:10;
+    .btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+      box-shadow:none;
     }
-    .bubble.open{display:block}
-    .bubble h3{font:600 22px/1.2 "Oswald"; margin:0 0 10px}
-    .bubble p,.bubble li{font-size:14px}
-    .bubble header{display:flex; justify-content:space-between; align-items:center; margin:0 0 8px}
-    .bubble .close{border:1px solid var(--black); background:var(--white); border-radius:10px; padding:6px 10px; cursor:pointer}
-    code{background:rgba(0,0,0,.06); padding:2px 5px; border-radius:6px}
+
+    .foot{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:20px;
+      font-size:12px;
+    }
+    .help-link{
+      text-decoration:underline;
+      cursor:pointer;
+    }
+
+    /* HELP OVERLAY (globo) */
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.65);
+      display:none;
+      align-items:flex-start;
+      justify-content:center;
+      padding:24px;
+      z-index:50;
+    }
+    .overlay.show{display:flex;}
+    .sheet{
+      background:var(--white);
+      border:1px solid var(--black);
+      box-shadow:8px 8px 0 var(--black);
+      max-width:820px;
+      width:100%;
+      padding:22px 18px 14px;
+      position:relative;
+    }
+    .sheet h2{
+      font-family:Oswald,Inter,sans-serif;
+      font-size:24px;
+      margin:0 0 8px;
+    }
+    .sheet .close{
+      position:absolute; top:10px; left:10px;
+      border:1px solid var(--black);
+      background:var(--tile);
+      font-size:16px;
+      padding:6px 10px;
+      cursor:pointer;
+      box-shadow:3px 3px 0 var(--black);
+    }
+    .faq{
+      margin-top:8px;
+      border-top:1px solid var(--black);
+    }
+    .faq details{
+      border-bottom:1px solid var(--black);
+      padding:12px 6px;
+    }
+    .faq summary{
+      list-style:none;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .faq summary::-webkit-details-marker{display:none}
+    .faq p{margin:8px 0 0; line-height:1.55;}
+
+    /* micro-leyenda editorial */
+    .tiny{
+      font-size:10.5px;
+      letter-spacing:.01em;
+    }
+
+    /* responsive */
+    @media (max-width:520px){
+      .card{padding:20px}
+      .actions{flex-direction:column}
+      .btn{width:100%}
+      .sheet{padding-top:42px}
+      .sheet .close{top:6px; left:6px}
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <!-- flecha izquierda (reflejo) por consistencia visual; aquí vuelve a “Inicio” (misma página) -->
-      <a class="home" href="/">
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M14.5 5.5L8 12l6.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Inicio
-      </a>
-      <div class="brand">Flujo Creativo</div>
-    </header>
+    <main class="container">
+      <section class="card" aria-labelledby="titulo">
+        <div class="eyebrow">Flujo Creativo · Sistema Notion Grid</div>
+        <h1 id="titulo">Aquí puedes encontrar tu enlace para configurar ◡̈</h1>
 
-    <main>
-      <!-- TITULAR EXACTO QUE PEDISTE -->
-      <h1>Aquí puedes encontrar tu link para setear! ◡̈</h1>
+        <p class="sub">
+          Guarda esta <strong>URL única</strong> en un lugar seguro: la usarás cada vez que crees un widget.
+          Piénsala como tu <strong>acceso personal</strong>.
+        </p>
 
-      <!-- Subtexto en español (antibobos) -->
-      <p class="lead">
-        Guarda esta URL única en un lugar seguro: la usarás cada vez que crees un widget. Piénsala como tu acceso personal.
-      </p>
+        <div class="url-box" id="urlBox" title="Tu enlace de configuración">
+          <span id="theUrl">Cargando…</span>
+        </div>
 
-      <!-- Caja con el link (solo una zona donde se muestra) -->
-      <div class="panel" id="panel">
-        <div class="url" id="the-url">https://tu-dominio.com/widgetsXXXX/setup?token=XXXX</div>
-        <button class="btn" id="copy">Copy URL</button>
-      </div>
+        <div class="actions">
+          <button class="btn" id="copyBtn" type="button">Copy URL</button>
+          <button class="btn btn-primary" id="goSetupBtn" type="button">Comenzar el Setup →</button>
+        </div>
 
-      <!-- Botones principales -->
-      <div class="actions">
-        <button class="btn btn--dark" id="go-setup">Comenzar el Setup del Grid →</button>
-      </div>
-
-      <!-- Footer editorial: texto minúsculo y “¿Necesitas ayuda?” abre globo -->
-      <footer>
-        <span>© 2025 Flujo Creativo · Sistema Notion Grid</span>
-        <span class="help-toggle" id="open-help">¿Necesitas ayuda?</span>
-      </footer>
+        <p class="tiny" style="margin-top:14px;color:#222">
+          Tip: esta URL contiene tu token. No la compartas públicamente.
+        </p>
+      </section>
     </main>
+
+    <footer class="foot">
+      <div>© 2025 Flujo Creativo · Sistema Notion Grid</div>
+      <div class="help-link" id="needHelp">¿Necesitas ayuda?</div>
+    </footer>
   </div>
 
-  <!-- Globo de ayuda con Q&A coherente con nuestro grid -->
-  <aside class="bubble" id="bubble">
-    <header>
-      <h3>Necesitas ayuda</h3>
-      <button class="close" id="close-help">
-        <!-- misma flecha pero hacia la derecha para “salir” del globo -->
-        <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="transform:scaleX(-1)">
-          <path d="M14.5 5.5L8 12l6.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Cerrar
-      </button>
-    </header>
-    <div>
-      <p><strong>¿Dónde encuentro mi Magic Link?</strong><br/>
-      Te lo enviamos al correo usado en la compra. Revisa spam o busca el remitente de la tienda.</p>
-
-      <p><strong>Perdí mi URL de Setup</strong><br/>
-      Repite la activación con el mismo correo; recibirás exactamente el mismo enlace.</p>
-
-      <p><strong>“Este correo no está registrado”</strong><br/>
-      Usa el mismo email del checkout (respetando mayúsculas/minúsculas si aplica).</p>
-
-      <p><strong>¿Más preguntas?</strong><br/>
-      Escríbenos a <a href="mailto:hello@flujo-creativo.test">hello@flujo-creativo.test</a>.</p>
+  <!-- HELP OVERLAY -->
+  <div class="overlay" id="overlay">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <button class="close" id="closeHelp" type="button">←</button>
+      <h2 id="helpTitle">Ayuda rápida</h2>
+      <div class="faq">
+        <details>
+          <summary>¿Dónde encuentro mi “enlace de configuración”?</summary>
+          <p>Después de comprar en la tienda (Shopify), te enviamos un correo de <strong>Flujo Creativo</strong> con el asunto “Tu enlace de configuración”. Ese correo contiene tu <strong>URL única</strong>. Si no lo ves, revisa <em>Spam</em> o busca “Flujo Creativo”.</p>
+        </details>
+        <details>
+          <summary>Perdí mi enlace. ¿Ahora qué?</summary>
+          <p>Vuelve a activar usando <strong>el mismo correo</strong> con el que compraste. Te llegará <strong>el mismo enlace</strong>. También puedes escribir a <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a> desde el <strong>correo de compra</strong> para que lo reenviemos.</p>
+        </details>
+        <details>
+          <summary>Me sale “este correo no está registrado”.</summary>
+          <p>Ocurre cuando intentas con un correo distinto al de la compra. Inicia con <strong>el correo que recibió la confirmación de Shopify</strong>.</p>
+        </details>
+        <details>
+          <summary>Quiero pasar de Básico a Pro.</summary>
+          <p>Compra <strong>Pro</strong> en la tienda. Al terminar, entra a tu <strong>misma URL única</strong> y refresca: verás las funciones Pro activas.</p>
+        </details>
+        <details>
+          <summary>¿Qué es el token y por qué importa?</summary>
+          <p>Tu URL incluye un <strong>token</strong> que identifica tu licencia. <strong>No lo compartas</strong> ni lo publiques. Guárdalo como tu acceso personal.</p>
+        </details>
+        <details>
+          <summary>¿Cómo pido soporte?</summary>
+          <p>Escríbeme a <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a>. Normalmente respondo en horario laboral.</p>
+        </details>
+      </div>
     </div>
-  </aside>
+  </div>
 
   <script>
-    // Lee token de la query y arma la URL final hacia /setup/
-    const params = new URLSearchParams(location.search);
-    const token = params.get('token') || 'DEMO123';
-    const setupURL = `${location.origin}/setup/?token=${encodeURIComponent(token)}`;
-    document.getElementById('the-url').textContent = setupURL;
+    (function(){
+      const params = new URLSearchParams(location.search);
+      const token = params.get("token") || ""; // si falta token, mostramos estado neutral
+      const origin = location.origin;
+      const setupURL = token ? `${origin}/setup.html?token=${encodeURIComponent(token)}` : `${origin}/setup.html`;
 
-    // Copiar al portapapeles
-    document.getElementById('copy').addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(setupURL);
-        const btn = document.getElementById('copy');
-        const prev = btn.textContent;
-        btn.textContent = 'Copiado ✓';
-        setTimeout(()=>btn.textContent=prev, 1200);
-      } catch {}
-    });
+      const theUrlEl = document.getElementById("theUrl");
+      const urlBox = document.getElementById("urlBox");
+      const copyBtn = document.getElementById("copyBtn");
+      const goSetupBtn = document.getElementById("goSetupBtn");
 
-    // Ir a Setup (antibobos)
-    document.getElementById('go-setup').addEventListener('click', () => {
-      location.href = setupURL;
-    });
+      if(token){
+        theUrlEl.textContent = setupURL;
+        copyBtn.disabled = false;
+        goSetupBtn.disabled = false;
+      }else{
+        theUrlEl.textContent = "Falta el parámetro ?token=... (esta URL no es tu enlace personal)";
+        copyBtn.disabled = true;
+        goSetupBtn.disabled = true;
+      }
 
-    // Globo de ayuda (misma página)
-    const bubble = document.getElementById('bubble');
-    document.getElementById('open-help').addEventListener('click', () => bubble.classList.add('open'));
-    document.getElementById('close-help').addEventListener('click', () => bubble.classList.remove('open'));
+      copyBtn.addEventListener("click", async () => {
+        try{
+          await navigator.clipboard.writeText(theUrlEl.textContent.trim());
+          copyBtn.textContent = "Copiado ✓";
+          setTimeout(()=> copyBtn.textContent = "Copy URL", 1600);
+        }catch(e){
+          // fallback
+          const r = document.createRange();
+          r.selectNodeContents(theUrlEl);
+          const sel = window.getSelection();
+          sel.removeAllRanges(); sel.addRange(r);
+          try{
+            document.execCommand("copy");
+            copyBtn.textContent = "Copiado ✓";
+            setTimeout(()=> copyBtn.textContent = "Copy URL", 1600);
+          }catch(_){}
+          sel.removeAllRanges();
+        }
+      });
 
-    // Permite abrir directamente con #help
-    if (location.hash === '#help') bubble.classList.add('open');
+      goSetupBtn.addEventListener("click", () => {
+        if(token) location.href = setupURL;
+      });
+
+      // Help overlay
+      const overlay = document.getElementById("overlay");
+      document.getElementById("needHelp").addEventListener("click", ()=> overlay.classList.add("show"));
+      document.getElementById("closeHelp").addEventListener("click", ()=> overlay.classList.remove("show"));
+
+      // Cerrar overlay con ESC
+      document.addEventListener("keydown", (e)=>{
+        if(e.key === "Escape") overlay.classList.remove("show");
+      });
+    })();
   </script>
 </body>
 </html>
