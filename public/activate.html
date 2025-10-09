@@ -2,100 +2,58 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Activar Widget (Demo)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Activar Widget · Sistema Notion Grid</title>
   <style>
-    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; max-width: 720px; margin: 40px auto; padding: 0 16px; }
-    .card { border: 1px solid #eee; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
-    label { display:block; margin: 12px 0 6px; font-weight: 600; }
-    input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; }
-    small { color: #666; }
-    button { margin-top: 16px; padding: 10px 16px; border-radius: 8px; border: 0; background: #111827; color: white; cursor: pointer; }
-    button[disabled] { opacity:.6; cursor:not-allowed; }
-    .row { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .muted { color:#666; }
-    .ok { color: #065f46; }
-    .err { color: #991b1b; }
-    pre { background:#f8fafc; padding:12px; border-radius:8px; overflow:auto; }
+    :root { --bg:#0b0c10; --card:#111216; --muted:#a5adba; --text:#e6e8ec; --accent:#76e8c6; }
+    *{box-sizing:border-box} body{margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial; background:#0b0c10; color:var(--text)}
+    .wrap{max-width:680px; margin:40px auto; padding:0 16px}
+    .card{background:var(--card); border:1px solid #1b1f2a; border-radius:16px; padding:18px}
+    label{display:block; font-weight:600; margin:10px 0 6px}
+    input{width:100%; padding:10px 12px; border-radius:10px; border:1px solid #263149; background:#0f121a; color:#e6e8ec}
+    button{margin-top:12px; padding:10px 14px; border-radius:10px; border:1px solid #254a3d; background:#10231c; color:#c8ffee; font-weight:700; cursor:pointer}
+    .note{color:var(--muted); font-size:13px}
+    .out{margin-top:12px; white-space:pre-wrap; background:#0e1218; border:1px solid #1a2130; border-radius:10px; padding:10px}
+    a.back{display:inline-block; margin-top:16px; color:#cfd6ff; text-decoration:none; border:1px solid #273046; padding:9px 12px; border-radius:10px; background:#121522}
   </style>
 </head>
 <body>
-  <h1>Activar Widget (Demo sin BD)</h1>
-  <p class="muted">Esta versión guarda el registro <strong>en memoria</strong> para validar UX. En la Fase B usaremos Supabase (persistente).</p>
-
-  <div class="card">
-    <form id="f">
-      <label>Email</label>
-      <input name="email" type="email" required placeholder="tu@correo.com" />
-
-      <label>Nombre de usuario (sin espacios)</label>
-      <input name="client_name" required placeholder="miusuario" />
-
-      <div class="row">
-        <div>
-          <label>NOTION_TOKEN</label>
-          <input name="notion_token" required placeholder="secret_xxx" />
-          <small class="muted">Debe empezar por <code>secret_</code> y tener acceso al DB.</small>
-        </div>
-        <div>
-          <label>NOTION_DATABASE_ID</label>
-          <input name="database_id" required placeholder="28673654be068172b043f8fd1dfdbcaa" />
-          <small class="muted">32 chars, sin guiones.</small>
-        </div>
-      </div>
-
-      <label>(Opcional) BIO_DATABASE_ID</label>
-      <input name="bio_database_id" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
-
-      <button id="btn" type="submit">Activar Widget</button>
-    </form>
-    <div id="out" style="margin-top:16px;"></div>
+  <div class="wrap">
+    <h1>Activar Widget</h1>
+    <p class="note">Demo de formulario para solicitar un <em>Magic Link</em>. Ajusta el endpoint en el código si tu backend usa otra ruta.</p>
+    <div class="card">
+      <label for="email">Tu email</label>
+      <input id="email" type="email" placeholder="tu@correo.com" />
+      <label for="workspace">Workspace / Notion DB</label>
+      <input id="workspace" type="text" placeholder="ID de la base" />
+      <button id="btn">Generar Magic Link</button>
+      <div id="out" class="out" hidden></div>
+    </div>
+    <a class="back" href="/">← Volver</a>
   </div>
-
   <script>
-    const f = document.getElementById('f');
-    const out = document.getElementById('out');
-    const btn = document.getElementById('btn');
-
-    f.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      btn.disabled = true; out.innerHTML = 'Procesando...';
-
-      const fd = new FormData(f);
-      const payload = {
-        email: fd.get('email'),
-        client_name: (fd.get('client_name')||'').toLowerCase().replace(/\s+/g,''),
-        notion_token: fd.get('notion_token'),
-        database_id: (fd.get('database_id')||'').replace(/-/g,''),
-        bio_database_id: (fd.get('bio_database_id')||'').replace(/-/g,'') || null
-      };
+    const $btn = document.getElementById('btn');
+    const $out = document.getElementById('out');
+    $btn.onclick = async () => {
+      const email = document.getElementById('email').value.trim();
+      const workspace = document.getElementById('workspace').value.trim();
+      if (!email) { alert('Escribe tu email'); return; }
 
       try {
-        const r = await fetch('/api/activate', {
+        // Ajusta la ruta a la que exponga tu backend el endpoint de magic link.
+        const res = await fetch('/api/magic-link', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          headers: { 'Content-Type':'application/json' },
+          body: JSON.stringify({ email, workspace })
         });
-        const data = await r.json();
-        if (!r.ok || !data.ok) {
-          out.innerHTML = `<p class="err"><strong>Error:</strong> ${data.message||'Fallo en activación'}</p><pre>${JSON.stringify(data, null, 2)}</pre>`;
-        } else {
-          out.innerHTML = `
-            <p class="ok"><strong>¡Listo!</strong> Guarda este link:</p>
-            <p><a href="${data.magic_link}" target="_blank">${data.magic_link}</a></p>
-            <button id="copy">Copiar link</button>
-            <pre>${JSON.stringify(data, null, 2)}</pre>
-          `;
-          document.getElementById('copy').onclick = () => {
-            navigator.clipboard.writeText(data.magic_link);
-          };
-        }
-      } catch (err) {
-        out.innerHTML = `<p class="err"><strong>Excepción:</strong> ${String(err)}</p>`;
-      } finally {
-        btn.disabled = false;
+        const data = await res.json().catch(()=>({}));
+        $out.hidden = false;
+        $out.textContent = 'Respuesta:\n' + JSON.stringify(data, null, 2);
+      } catch (e) {
+        $out.hidden = false;
+        $out.textContent = 'Error al solicitar Magic Link.\n' + e;
       }
-    });
+    };
   </script>
 </body>
 </html>
