@@ -3,145 +3,62 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Notion Grid · Vista</title>
+  <title>Notion Grid — Vista</title>
   <style>
-    :root { --bg:#0b0b0c; --fg:#e8e8e8; --muted:#9aa0a6; --card:#131316; --acc:#8b5cf6; }
-    * { box-sizing: border-box; }
-    body {
-      margin:0; background:var(--bg); color:var(--fg);
-      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    }
-    header {
-      padding:16px 20px; border-bottom:1px solid #232327; position:sticky; top:0; background:rgba(11,11,12,.85); backdrop-filter: blur(8px);
-      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
-    }
-    header h1 { margin:0; font-size:18px; }
-    header a { color:var(--muted); text-decoration:none; }
-    header a:hover { color:var(--fg); }
-    .toolbar { margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
-    .toolbar input, .toolbar button {
-      background:#1b1b20; border:1px solid #2a2a30; color:var(--fg); border-radius:8px; padding:8px 10px; font-size:14px;
-    }
-    .toolbar button { cursor:pointer; }
-    main { padding:20px; max-width:1200px; margin:0 auto; }
-    .grid {
-      display:grid; grid-template-columns: repeat(1, minmax(0,1fr)); gap:14px;
-    }
-    @media(min-width:640px){ .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
-    @media(min-width:960px){ .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); } }
-    .card {
-      background:var(--card); border:1px solid #232327; border-radius:14px; overflow:hidden;
-      display:flex; flex-direction:column; min-height:280px;
-      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-    }
-    .card:hover { transform: translateY(-2px); border-color:#2f2f34; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
-    .media { aspect-ratio: 1 / 1; width:100%; background:#0f0f12; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-    .media img, .media video { width:100%; height:100%; object-fit:cover; display:block; }
-    .body { padding:12px 14px 14px; display:flex; flex-direction:column; gap:6px; }
-    .title { font-size:15px; line-height:1.4; font-weight:600; }
-    .cap { font-size:13px; color:var(--muted); white-space:pre-line; }
-    .row { display:flex; gap:8px; margin-top:6px; }
-    .btn {
-      appearance:none; border:1px solid #2a2a30; background:#1b1b20; color:var(--fg);
-      border-radius:10px; padding:8px 10px; font-size:13px; cursor:pointer; text-decoration:none;
-    }
-    .btn:hover { border-color:#3a3a41; }
-    .buy { border-color: #3c2a83; background: #201a3b; color:#d9d3ff; }
-    footer { text-align:center; color:var(--muted); font-size:12px; padding:20px; }
-    .empty { color:var(--muted); text-align:center; padding:40px 10px; border:1px dashed #2a2a30; border-radius:14px; }
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; line-height: 1.4; }
+    header { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 16px; }
+    .card { border: 1px solid #eee; border-radius: 12px; padding: 12px; background:#fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .card img { width: 100%; height: 220px; object-fit: cover; border-radius: 8px; }
+    .title { font-weight: 600; margin: 8px 0 4px; }
+    .caption { color: #666; font-size: 14px; min-height: 2.4em; }
+    .actions { margin-top: 8px; display:flex; gap:8px; flex-wrap:wrap; }
+    .btn { text-decoration: none; font-size: 14px; padding: 6px 10px; border:1px solid #ddd; border-radius: 8px; }
+    .muted { color:#777; font-size: 13px; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Notion Grid</h1>
-    <a href="/">Inicio</a>
-    <div class="toolbar">
-      <input id="token" placeholder="token (opcional)" />
-      <button id="load">Cargar</button>
-    </div>
+    <h1>Instagram Grid — Vista</h1>
+    <nav>
+      <a class="btn" href="/public/index.html">← Volver</a>
+      <a class="btn" href="/api/grid" target="_blank" rel="noopener">Ver JSON</a>
+    </nav>
   </header>
 
-  <main>
-    <div id="grid" class="grid" aria-live="polite"></div>
-    <div id="empty" class="empty" style="display:none">No hay elementos para mostrar.</div>
-  </main>
-
-  <footer>© 2025 Flujo Creativo</footer>
+  <div id="status" class="muted">Cargando...</div>
+  <div id="grid" class="grid"></div>
 
   <script>
-    const q = new URLSearchParams(location.search);
-    const tokenInput = document.getElementById('token');
-    const gridEl = document.getElementById('grid');
-    const emptyEl = document.getElementById('empty');
-
-    tokenInput.value = q.get('token') || '';
-
-    document.getElementById('load').addEventListener('click', () => {
-      const t = tokenInput.value.trim();
-      const url = t ? `/api/grid?token=${encodeURIComponent(t)}` : '/api/grid';
-      load(url);
-      const next = new URL(location.href);
-      if (t) next.searchParams.set('token', t); else next.searchParams.delete('token');
-      history.replaceState(null, '', next);
-    });
-
-    function isVideo(url){ return typeof url === 'string' && /\.(mp4|mov|webm)(\?|$)/i.test(url); }
-
-    async function load(url) {
-      gridEl.innerHTML = '';
-      emptyEl.style.display = 'none';
+    async function load() {
       try {
-        const res = await fetch(url, { cache:'no-store' });
+        const res = await fetch('/api/grid');
         const data = await res.json();
-        if (!data || !Array.isArray(data.items) || data.items.length === 0){
-          emptyEl.style.display = 'block';
-          return;
-        }
-        for (const item of data.items) {
-          const card = document.createElement('article'); card.className = 'card';
-          const media = document.createElement('div'); media.className = 'media';
+        document.getElementById('status').textContent = `Items: ${data.count ?? (data.items?.length || 0)}`;
 
-          if (item.image && isVideo(item.image)) {
-            const v = document.createElement('video'); v.src = item.image; v.muted = true; v.autoplay = true; v.loop = true; v.playsInline = true;
-            media.appendChild(v);
-          } else if (item.image) {
-            const img = document.createElement('img'); img.src = item.image; img.alt = item.title || 'post';
-            media.appendChild(img);
-          } else {
-            media.textContent = 'Sin imagen';
-          }
-
-          const body = document.createElement('div'); body.className = 'body';
-          const title = document.createElement('div'); title.className = 'title'; title.textContent = item.title || 'Sin título';
-          const cap = document.createElement('div'); cap.className = 'cap'; cap.textContent = item.caption || '';
-
-          const row = document.createElement('div'); row.className = 'row';
-          if (item.href) {
-            const a = document.createElement('a'); a.className = 'btn'; a.textContent = 'Abrir';
-            a.href = item.href.split('\n')[0].trim(); a.target = '_blank'; a.rel = 'noopener';
-            row.appendChild(a);
-          }
-          // Botón de compra (placeholder). Luego lo conectamos a Shopify.
-          const buy = document.createElement('button'); buy.className = 'btn buy'; buy.textContent = 'Comprar';
-          buy.addEventListener('click', () => {
-            // TODO: Reemplazar con URL de Shopify por item (p. ej. variantId)
-            alert('Conectar a Shopify aquí (siguiente paso)');
-          });
-          row.appendChild(buy);
-
-          body.append(title, cap, row);
-          card.append(media, body);
-          gridEl.appendChild(card);
-        }
+        const items = data.items || [];
+        const grid = document.getElementById('grid');
+        grid.innerHTML = items.map(it => {
+          const firstHref = (it.href || '').split('\n')[0].trim();
+          const img = it.image ? `<img src="${it.image}" alt="${(it.title||'').replace(/"/g,'&quot;')}" />` : '';
+          return `
+            <div class="card">
+              ${img}
+              <div class="title">${it.title || 'Sin título'}</div>
+              <div class="caption">${it.caption || ''}</div>
+              <div class="actions">
+                ${firstHref ? `<a class="btn" href="${firstHref}" target="_blank" rel="noopener">Abrir →</a>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
       } catch (e) {
-        emptyEl.style.display = 'block';
+        document.getElementById('status').textContent = 'Error cargando el grid';
         console.error(e);
       }
     }
-
-    // Auto-cargar al abrir
-    const initial = tokenInput.value ? `/api/grid?token=${encodeURIComponent(tokenInput.value)}` : '/api/grid';
-    load(initial);
+    load();
   </script>
 </body>
 </html>
