@@ -2,63 +2,133 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Notion Grid — Vista</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ver Grid · Sistema Notion Grid</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root { color-scheme: light dark; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; line-height: 1.4; }
-    header { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:16px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 16px; }
-    .card { border: 1px solid #eee; border-radius: 12px; padding: 12px; background:#fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
-    .card img { width: 100%; height: 220px; object-fit: cover; border-radius: 8px; }
-    .title { font-weight: 600; margin: 8px 0 4px; }
-    .caption { color: #666; font-size: 14px; min-height: 2.4em; }
-    .actions { margin-top: 8px; display:flex; gap:8px; flex-wrap:wrap; }
-    .btn { text-decoration: none; font-size: 14px; padding: 6px 10px; border:1px solid #ddd; border-radius: 8px; }
-    .muted { color:#777; font-size: 13px; }
+    :root { --bg:#0b0c10; --card:#111216; --muted:#a5adba; --text:#e6e8ec; --accent:#76e8c6; --accent2:#8ab4ff; }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial; background:#0b0c10; color:var(--text)}
+    .wrap{max-width:1100px; margin:36px auto; padding:0 16px}
+    header{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px}
+    .title{display:flex; align-items:center; gap:10px}
+    .pill{font-size:12px; color:#0e1a14; background:var(--accent); border-radius:999px; padding:5px 9px; font-weight:800}
+    a.back{color:#cfd6ff; text-decoration:none; font-weight:600; border:1px solid #273046; padding:9px 12px; border-radius:10px; background:#121522}
+    a.back:hover{border-color:#324066}
+    .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px}
+    .card{background:var(--card); border:1px solid #1b1f2a; border-radius:14px; overflow:hidden; display:flex; flex-direction:column}
+    .thumb{position:relative; aspect-ratio:1/1; background:#0f0f12; display:grid; place-items:center}
+    .thumb img, .thumb video{width:100%; height:100%; object-fit:cover; display:block}
+    .content{padding:12px}
+    .title2{font-weight:700; font-size:14px; margin:0 0 6px}
+    .cap{color:var(--muted); font-size:13px; line-height:1.45; margin:0 0 10px}
+    .cta{display:flex; gap:8px}
+    .btn{flex:1; text-decoration:none; text-align:center; padding:10px 12px; border-radius:10px; border:1px solid #23314a; background:#131a27; color:#e6e8ec; font-weight:600; font-size:13px}
+    .btn:hover{border-color:#2e4367}
+    .empty{color:var(--muted); text-align:center; padding:40px 0}
+    .error{background:#2b1010; border:1px solid #512020; color:#ffd3d3; padding:12px; border-radius:10px; margin:12px 0}
+    .meta{color:#93a0b3; font-size:12px; margin-top:6px}
   </style>
 </head>
 <body>
-  <header>
-    <h1>Instagram Grid — Vista</h1>
-    <nav>
-      <a class="btn" href="/public/index.html">← Volver</a>
-      <a class="btn" href="/api/grid" target="_blank" rel="noopener">Ver JSON</a>
-    </nav>
-  </header>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <span class="pill">GRID</span>
+        <h1 style="margin:0;font-size:22px">Instagram Grid (Demo)</h1>
+      </div>
+      <a class="back" href="/">← Volver</a>
+    </header>
 
-  <div id="status" class="muted">Cargando...</div>
-  <div id="grid" class="grid"></div>
+    <div id="error" class="error" style="display:none"></div>
+    <div id="meta" class="meta"></div>
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" style="display:none">No hay publicaciones todavía.</div>
+  </div>
 
   <script>
-    async function load() {
-      try {
-        const res = await fetch('/api/grid');
-        const data = await res.json();
-        document.getElementById('status').textContent = `Items: ${data.count ?? (data.items?.length || 0)}`;
+    const $grid = document.getElementById('grid');
+    const $meta = document.getElementById('meta');
+    const $err = document.getElementById('error');
+    const $empty = document.getElementById('empty');
 
-        const items = data.items || [];
-        const grid = document.getElementById('grid');
-        grid.innerHTML = items.map(it => {
-          const firstHref = (it.href || '').split('\n')[0].trim();
-          const img = it.image ? `<img src="${it.image}" alt="${(it.title||'').replace(/"/g,'&quot;')}" />` : '';
-          return `
-            <div class="card">
-              ${img}
-              <div class="title">${it.title || 'Sin título'}</div>
-              <div class="caption">${it.caption || ''}</div>
-              <div class="actions">
-                ${firstHref ? `<a class="btn" href="${firstHref}" target="_blank" rel="noopener">Abrir →</a>` : ''}
-              </div>
-            </div>
-          `;
-        }).join('');
+    const isVideo = (url="") => /\.(mp4|webm|mov)(\?|$)/i.test(url);
+
+    const makeCard = (item) => {
+      const wrap = document.createElement('article');
+      wrap.className = 'card';
+
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb';
+
+      if (isVideo(item.image)) {
+        const v = document.createElement('video');
+        v.src = item.image;
+        v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true;
+        thumb.appendChild(v);
+      } else {
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.alt = item.title || 'Post';
+        img.src = item.image;
+        thumb.appendChild(img);
+      }
+
+      const content = document.createElement('div');
+      content.className = 'content';
+
+      const h = document.createElement('h3');
+      h.className = 'title2';
+      h.textContent = item.title || 'Post';
+
+      const p = document.createElement('p');
+      p.className = 'cap';
+      p.textContent = item.caption || '';
+
+      const cta = document.createElement('div');
+      cta.className = 'cta';
+
+      if (item.href) {
+        const a = document.createElement('a');
+        a.className = 'btn';
+        a.href = item.href.split(/\s+/)[0]; // si vienen múltiples enlaces en href, toma el primero
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = 'Abrir enlace';
+        cta.appendChild(a);
+      }
+
+      content.appendChild(h);
+      if (p.textContent) content.appendChild(p);
+      content.appendChild(cta);
+
+      wrap.appendChild(thumb);
+      wrap.appendChild(content);
+      return wrap;
+    };
+
+    async function loadGrid() {
+      try {
+        const res = await fetch('/api/grid', { headers: { 'Accept':'application/json' }});
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        $meta.textContent = `Posts: ${data.count ?? (data.items?.length || 0)} · usingClient: ${!!data.usingClient}`;
+        if (!data.items || data.items.length === 0) {
+          $empty.style.display = 'block';
+          return;
+        }
+        data.items.forEach(item => $grid.appendChild(makeCard(item)));
       } catch (e) {
-        document.getElementById('status').textContent = 'Error cargando el grid';
         console.error(e);
+        $err.style.display = 'block';
+        $err.textContent = 'No se pudo cargar /api/grid. Revisa la consola y el backend.';
       }
     }
-    load();
+
+    loadGrid();
   </script>
 </body>
 </html>
