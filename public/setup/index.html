@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Success — Setup Link</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="hstack">
+        <a class="brand" href="/">← Flujo Creativo</a>
+        <div class="badge">Setup</div>
+      </div>
+    </header>
+
+    <div class="card vstack">
+      <h1>Success 🎉</h1>
+      <p>Here’s your unique Setup Link. Guárdalo; es tu acceso personal.</p>
+
+      <!-- Link derivado de la URL actual (incluye el token). Dos áreas -->
+      <div class="card vstack" style="background:rgba(6,182,212,.1); border-color:rgba(6,182,212,.35)">
+        <div id="heroLink" class="kbd"></div>
+        <div class="hstack">
+          <button id="copyHero" class="btn copy">Copiar</button>
+          <a id="goWizard" class="btn primary" href="#">Go to Setup →</a>
+        </div>
+      </div>
+
+      <label>Setup Link (copia/pega):</label>
+      <div class="hstack">
+        <input id="linkInput" class="input" type="text" readonly />
+        <button id="copyInput" class="btn copy">Copiar</button>
+        <a id="openLink" class="btn" href="#">Abrir</a>
+      </div>
+
+      <p style="margin-top:10px">Siguiente: completa el asistente para conectar tus datos y publicar el widget.</p>
+    </div>
+
+    <footer>© 2025 Flujo Creativo</footer>
+  </div>
+
+  <script type="module">
+    import { qs, copy, getParam } from "/js/utils.js";
+    const token = getParam("token");
+    const base = `${location.origin}/setup/index.html?token=${encodeURIComponent(token)}`;
+
+    const heroLink = qs("#heroLink");
+    const linkInput = qs("#linkInput");
+    const copyHero = qs("#copyHero");
+    const copyInput = qs("#copyInput");
+    const goWizard = qs("#goWizard");
+    const openLink = qs("#openLink");
+
+    const wizard = `/setup/wizard.html?token=${encodeURIComponent(token)}`;
+
+    heroLink.textContent = base;
+    linkInput.value = base;
+    goWizard.href = wizard;
+    openLink.href = base;
+
+    copyHero.addEventListener("click", () => copy(heroLink.textContent, copyHero));
+    copyInput.addEventListener("click", () => copy(linkInput.value, copyInput));
+  </script>
+</body>
+</html>
