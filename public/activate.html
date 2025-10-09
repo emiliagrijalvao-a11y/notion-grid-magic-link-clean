@@ -2,68 +2,92 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
+  <title>Activar Widget – Magic Link</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Activar Widget — Magic Link</title>
-  <style>
-    :root { color-scheme: light dark; }
-    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, 'Helvetica Neue', sans-serif; }
-    header { padding: 16px 20px; border-bottom: 1px solid color-mix(in oklab, CanvasText 15%, transparent); }
-    .wrap { max-width: 620px; margin: 0 auto; padding: 22px; }
-    form { display: grid; gap: 12px; }
-    input, button {
-      font: inherit; padding: 10px 12px; border-radius: 10px;
-      border: 1px solid color-mix(in oklab, CanvasText 15%, transparent);
-      background: color-mix(in oklab, CanvasText 3%, Canvas);
-    }
-    button { cursor: pointer; }
-    .out { margin-top: 14px; font-size: 14px; word-break: break-all; }
-    .mini { font-size: 12px; opacity: .7; margin-top: 16px; }
-  </style>
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <header><a href="/">← Volver</a></header>
-  <div class="wrap">
-    <h1>Activar Widget</h1>
-    <p>Demo de Magic Link (solo UI). Reemplaza la generación local por tu backend cuando esté listo.</p>
+  <div class="container">
+    <header>
+      <div class="hstack">
+        <a class="brand" href="/">← Flujo Creativo</a>
+        <div class="badge">Activar Widget</div>
+      </div>
+    </header>
 
-    <form id="f">
-      <label>Email del comprador
-        <input type="email" id="email" required placeholder="cliente@correo.com" />
-      </label>
-      <label>Producto / Plan (opcional)
-        <input type="text" id="plan" placeholder="instagram-grid-basic" />
-      </label>
-      <button>Generar Magic Link</button>
-    </form>
+    <div class="card vstack">
+      <h1>Genera tu Magic Link</h1>
+      <p>Introduce tu correo y, si quieres, tu fuente de datos (endpoint que devuelve el JSON del grid).</p>
 
-    <div id="out" class="out"></div>
-    <p class="mini">
-      Instrucción en UI: este formulario puede llamar a un <code>POST /api/activate</code> propio y devolver
-      una URL tipo <code>https://tu-dominio.com/widgets/xxxx/setup?token=YYYY</code>.
-    </p>
+      <form id="form" class="vstack" style="margin-top:8px">
+        <input class="input" type="email" name="email" placeholder="tu@correo.com (opcional)" />
+        <input class="input" type="url" name="upstreamUrl" placeholder="https://TU-ENDPOINT/api/grid (opcional)" />
+        <button class="btn primary" type="submit">Crear Magic Link</button>
+      </form>
+
+      <div id="result" style="display:none" class="vstack">
+        <h2 style="margin-top:12px">Success — Here’s Your Setup Link ✅</h2>
+
+        <!-- Área 1: Hero con el link y CTA -->
+        <div class="card vstack" style="background:rgba(22,163,74,.1); border-color:rgba(22,163,74,.35)">
+          <div id="heroLink" class="kbd"></div>
+          <div class="hstack">
+            <button id="copyHero" class="btn copy">Copiar</button>
+            <a id="goToSetupA" class="btn primary" href="#">Go to Setup →</a>
+          </div>
+        </div>
+
+        <!-- Área 2: Caja de texto para copiar el link -->
+        <label>Setup Link (copia/pega):</label>
+        <div class="hstack">
+          <input id="linkInput" class="input" type="text" readonly />
+          <button id="copyInput" class="btn copy">Copiar</button>
+          <a id="goToSetupB" class="btn" href="#">Abrir</a>
+        </div>
+      </div>
+    </div>
+
+    <footer>© 2025 Flujo Creativo</footer>
   </div>
 
-  <script>
-    // Generación local de link de ejemplo (sustituir por tu API real)
-    const $f = document.getElementById("f");
-    const $out = document.getElementById("out");
+  <script type="module">
+    import { qs, copy } from "/js/utils.js";
 
-    $f.addEventListener("submit", async (e) => {
+    const form = qs("#form");
+    const result = qs("#result");
+    const heroLink = qs("#heroLink");
+    const linkInput = qs("#linkInput");
+    const copyHero = qs("#copyHero");
+    const copyInput = qs("#copyInput");
+    const goA = qs("#goToSetupA");
+    const goB = qs("#goToSetupB");
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = document.getElementById("email").value.trim();
-      const plan = document.getElementById("plan").value.trim() || "instagram-grid-basic";
+      const fd = new FormData(form);
+      const email = (fd.get("email") || "").toString().trim();
+      const upstreamUrl = (fd.get("upstreamUrl") || "").toString().trim();
 
-      const token = crypto.randomUUID().replace(/-/g, "").slice(0, 24).toUpperCase();
-      const link = `${location.origin}/grid.html#token=${token}&email=${encodeURIComponent(email)}&plan=${encodeURIComponent(plan)}`;
+      const r = await fetch("/api/magic", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, upstreamUrl }),
+      });
+      const j = await r.json();
+      if (!j.ok) {
+        alert("Error creando Magic Link");
+        return;
+      }
 
-      $out.innerHTML = `
-        <div><strong>Success</strong> — Setup link:</div>
-        <div style="margin-top:8px;"><code>${link}</code></div>
-        <div style="margin-top:8px;">
-          <a href="${link}" target="_blank" rel="noopener">Abrir →</a>
-        </div>
-      `;
+      heroLink.textContent = j.setupLink;
+      linkInput.value = j.setupLink;
+      goA.href = j.setupLink;
+      goB.href = j.setupLink;
+      result.style.display = "flex";
     });
+
+    copyHero.addEventListener("click", () => copy(heroLink.textContent, copyHero));
+    copyInput.addEventListener("click", () => copy(linkInput.value, copyInput));
   </script>
 </body>
 </html>
