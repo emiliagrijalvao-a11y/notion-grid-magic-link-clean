@@ -3,57 +3,65 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Activar Widget · Sistema Notion Grid</title>
+  <title>Activar Widget — Magic Link</title>
   <style>
-    :root { --bg:#0b0c10; --card:#111216; --muted:#a5adba; --text:#e6e8ec; --accent:#76e8c6; }
-    *{box-sizing:border-box} body{margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial; background:#0b0c10; color:var(--text)}
-    .wrap{max-width:680px; margin:40px auto; padding:0 16px}
-    .card{background:var(--card); border:1px solid #1b1f2a; border-radius:16px; padding:18px}
-    label{display:block; font-weight:600; margin:10px 0 6px}
-    input{width:100%; padding:10px 12px; border-radius:10px; border:1px solid #263149; background:#0f121a; color:#e6e8ec}
-    button{margin-top:12px; padding:10px 14px; border-radius:10px; border:1px solid #254a3d; background:#10231c; color:#c8ffee; font-weight:700; cursor:pointer}
-    .note{color:var(--muted); font-size:13px}
-    .out{margin-top:12px; white-space:pre-wrap; background:#0e1218; border:1px solid #1a2130; border-radius:10px; padding:10px}
-    a.back{display:inline-block; margin-top:16px; color:#cfd6ff; text-decoration:none; border:1px solid #273046; padding:9px 12px; border-radius:10px; background:#121522}
+    :root { color-scheme: light dark; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, 'Helvetica Neue', sans-serif; }
+    header { padding: 16px 20px; border-bottom: 1px solid color-mix(in oklab, CanvasText 15%, transparent); }
+    .wrap { max-width: 620px; margin: 0 auto; padding: 22px; }
+    form { display: grid; gap: 12px; }
+    input, button {
+      font: inherit; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid color-mix(in oklab, CanvasText 15%, transparent);
+      background: color-mix(in oklab, CanvasText 3%, Canvas);
+    }
+    button { cursor: pointer; }
+    .out { margin-top: 14px; font-size: 14px; word-break: break-all; }
+    .mini { font-size: 12px; opacity: .7; margin-top: 16px; }
   </style>
 </head>
 <body>
+  <header><a href="/">← Volver</a></header>
   <div class="wrap">
     <h1>Activar Widget</h1>
-    <p class="note">Demo de formulario para solicitar un <em>Magic Link</em>. Ajusta el endpoint en el código si tu backend usa otra ruta.</p>
-    <div class="card">
-      <label for="email">Tu email</label>
-      <input id="email" type="email" placeholder="tu@correo.com" />
-      <label for="workspace">Workspace / Notion DB</label>
-      <input id="workspace" type="text" placeholder="ID de la base" />
-      <button id="btn">Generar Magic Link</button>
-      <div id="out" class="out" hidden></div>
-    </div>
-    <a class="back" href="/">← Volver</a>
-  </div>
-  <script>
-    const $btn = document.getElementById('btn');
-    const $out = document.getElementById('out');
-    $btn.onclick = async () => {
-      const email = document.getElementById('email').value.trim();
-      const workspace = document.getElementById('workspace').value.trim();
-      if (!email) { alert('Escribe tu email'); return; }
+    <p>Demo de Magic Link (solo UI). Sustituye la llamada por tu endpoint real cuando lo tengas listo.</p>
 
-      try {
-        // Ajusta la ruta a la que exponga tu backend el endpoint de magic link.
-        const res = await fetch('/api/magic-link', {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json' },
-          body: JSON.stringify({ email, workspace })
-        });
-        const data = await res.json().catch(()=>({}));
-        $out.hidden = false;
-        $out.textContent = 'Respuesta:\n' + JSON.stringify(data, null, 2);
-      } catch (e) {
-        $out.hidden = false;
-        $out.textContent = 'Error al solicitar Magic Link.\n' + e;
-      }
-    };
+    <form id="f">
+      <label>Email del comprador
+        <input type="email" id="email" required placeholder="cliente@correo.com" />
+      </label>
+      <label>Producto / Plan (opcional)
+        <input type="text" id="plan" placeholder="instagram-grid-basic" />
+      </label>
+      <button>Generar Magic Link</button>
+    </form>
+
+    <div id="out" class="out"></div>
+    <p class="mini">Cuando tengas tu backend, este formulario puede llamar a <code>/api/activate</code> y devolver
+      una URL tipo: <code>https://tu-dominio.com/widgets/xxxx/setup?token=YYYY</code>.</p>
+  </div>
+
+  <script>
+    const $f = document.getElementById("f");
+    const $out = document.getElementById("out");
+
+    $f.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const plan = document.getElementById("plan").value.trim() || "instagram-grid-basic";
+
+      // DEMO: genera un link local. Reemplaza por tu POST /api/activate real.
+      const token = crypto.randomUUID().replace(/-/g, "").slice(0, 24).toUpperCase();
+      const link = `${location.origin}/grid.html#token=${token}&email=${encodeURIComponent(email)}&plan=${encodeURIComponent(plan)}`;
+
+      $out.innerHTML = `
+        <div><strong>Success</strong> — Here's your setup link:</div>
+        <div style="margin-top:8px;"><code>${link}</code></div>
+        <div style="margin-top:8px;">
+          <a href="${link}" target="_blank" rel="noopener">Go to Setup →</a>
+        </div>
+      `;
+    });
   </script>
 </body>
 </html>
