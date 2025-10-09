@@ -1,19 +1,19 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Flujo Creativo · Notion Grid (demo)</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Flujo Creativo · Tu link de Setup</title>
 
-  <!-- Fonts -->
+  <!-- Tipografías -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --beige:#D9D9D9;
-      --tile:#ECEBE8;
+      --beige:#D9D9D9;     /* fondo */
+      --tile:#ECEBE8;      /* tarjetas / resaltados */
       --black:#000000;
       --white:#FFFFFF;
     }
@@ -21,57 +21,151 @@
     html,body{height:100%}
     body{
       margin:0; background:var(--beige); color:var(--black);
-      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
     }
-    .wrap{max-width:920px; margin:0 auto; padding:48px 24px 80px}
-    header{display:flex; align-items:center; justify-content:space-between; margin-bottom:36px}
-    .brand{font-weight:800; letter-spacing:.2px}
-    .chip{font:600 12px/1 "Inter"; padding:6px 10px; border:1px solid var(--black); border-radius:999px}
-    .card{
-      background:var(--tile); border:1px solid var(--black);
-      border-radius:18px; padding:32px; box-shadow:4px 4px 0 var(--black)
+    .wrap{max-width:760px; margin:0 auto; padding:48px 20px 96px}
+    header{display:flex; align-items:center; justify-content:space-between; margin-bottom:28px}
+    .brand{font-weight:800}
+    .home{
+      display:inline-flex; gap:8px; align-items:center; text-decoration:none;
+      color:inherit; border:1px solid var(--black); padding:8px 10px; border-radius:10px;
+      background:var(--tile)
     }
-    h1{font:600 40px/1.1 "Oswald", sans-serif; margin:0 0 12px}
-    p{margin:0 0 10px; font-size:16px}
-    ul{margin:10px 0 0 20px}
-    .actions{display:flex; gap:12px; margin-top:22px}
+    .arrow{width:14px;height:14px}
+    h1{font:600 40px/1.1 "Oswald",sans-serif; margin:12px 0}
+    .lead{max-width:65ch; margin:2px 0 18px; font-size:16px}
+    .panel{
+      background:var(--tile); border:1px solid var(--black); border-radius:18px;
+      padding:18px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+      box-shadow:4px 4px 0 var(--black);
+    }
+    .url{
+      font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      overflow:auto; white-space:nowrap;
+    }
+    .actions{display:flex; gap:10px; margin-top:14px}
     .btn{
       appearance:none; border:1px solid var(--black); background:var(--tile);
-      padding:12px 18px; font-weight:600; cursor:pointer; border-radius:10px
+      padding:12px 16px; font-weight:600; cursor:pointer; border-radius:10px
     }
     .btn--dark{background:var(--black); color:var(--white)}
     footer{
-      margin-top:28px; display:flex; justify-content:space-between; font-size:12px;
-      opacity:.8
+      margin-top:28px; display:flex; justify-content:space-between; align-items:center; gap:12px;
+      font-size:12px; opacity:.9
     }
-    a{color:inherit}
+    .help-toggle{cursor:pointer; text-decoration:underline}
+    /* Globo de ayuda */
+    .bubble{
+      position:fixed; right:18px; bottom:18px; width:min(520px, calc(100% - 36px));
+      background:var(--tile); border:1px solid var(--black); border-radius:18px;
+      padding:18px; box-shadow:6px 6px 0 var(--black); display:none; z-index:10;
+    }
+    .bubble.open{display:block}
+    .bubble h3{font:600 22px/1.2 "Oswald"; margin:0 0 10px}
+    .bubble p,.bubble li{font-size:14px}
+    .bubble header{display:flex; justify-content:space-between; align-items:center; margin:0 0 8px}
+    .bubble .close{border:1px solid var(--black); background:var(--white); border-radius:10px; padding:6px 10px; cursor:pointer}
+    code{background:rgba(0,0,0,.06); padding:2px 5px; border-radius:6px}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
+      <!-- flecha izquierda (reflejo) por consistencia visual; aquí vuelve a “Inicio” (misma página) -->
+      <a class="home" href="/">
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M14.5 5.5L8 12l6.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Inicio
+      </a>
       <div class="brand">Flujo Creativo</div>
-      <div class="chip">Notion Grid (demo)</div>
     </header>
 
-    <section class="card">
-      <h1>Bienvenido </h1>
-      <p>Este es el demo funcional del sistema de widgets Notion Grid.</p>
-      <ul>
-        <li>Genera un <em>Magic Link</em> (demo) y mira la página de “Success”.</li>
-        <li>Desde “Success” pasa al Setup.</li>
-      </ul>
-      <div class="actions">
-        <a class="btn" href="/grid.html">Ver Grid (demo)</a>
-        <!-- Llévate a la página “Success” nueva (demo con token falso) -->
-        <a class="btn btn--dark" href="/success.html?token=DEMO123">Ir a Success →</a>
-      </div>
-    </section>
+    <main>
+      <!-- TITULAR EXACTO QUE PEDISTE -->
+      <h1>Aquí puedes encontrar tu link para setear! ◡̈</h1>
 
-    <footer>
-      <span>© 2025 Flujo Creativo · Sistema Notion Grid</span>
-      <a href="/success.html?token=DEMO123#help">¿Necesitas ayuda?</a>
-    </footer>
+      <!-- Subtexto en español (antibobos) -->
+      <p class="lead">
+        Guarda esta URL única en un lugar seguro: la usarás cada vez que crees un widget. Piénsala como tu acceso personal.
+      </p>
+
+      <!-- Caja con el link (solo una zona donde se muestra) -->
+      <div class="panel" id="panel">
+        <div class="url" id="the-url">https://tu-dominio.com/widgetsXXXX/setup?token=XXXX</div>
+        <button class="btn" id="copy">Copy URL</button>
+      </div>
+
+      <!-- Botones principales -->
+      <div class="actions">
+        <button class="btn btn--dark" id="go-setup">Comenzar el Setup del Grid →</button>
+      </div>
+
+      <!-- Footer editorial: texto minúsculo y “¿Necesitas ayuda?” abre globo -->
+      <footer>
+        <span>© 2025 Flujo Creativo · Sistema Notion Grid</span>
+        <span class="help-toggle" id="open-help">¿Necesitas ayuda?</span>
+      </footer>
+    </main>
   </div>
+
+  <!-- Globo de ayuda con Q&A coherente con nuestro grid -->
+  <aside class="bubble" id="bubble">
+    <header>
+      <h3>Necesitas ayuda</h3>
+      <button class="close" id="close-help">
+        <!-- misma flecha pero hacia la derecha para “salir” del globo -->
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="transform:scaleX(-1)">
+          <path d="M14.5 5.5L8 12l6.5 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Cerrar
+      </button>
+    </header>
+    <div>
+      <p><strong>¿Dónde encuentro mi Magic Link?</strong><br/>
+      Te lo enviamos al correo usado en la compra. Revisa spam o busca el remitente de la tienda.</p>
+
+      <p><strong>Perdí mi URL de Setup</strong><br/>
+      Repite la activación con el mismo correo; recibirás exactamente el mismo enlace.</p>
+
+      <p><strong>“Este correo no está registrado”</strong><br/>
+      Usa el mismo email del checkout (respetando mayúsculas/minúsculas si aplica).</p>
+
+      <p><strong>¿Más preguntas?</strong><br/>
+      Escríbenos a <a href="mailto:hello@flujo-creativo.test">hello@flujo-creativo.test</a>.</p>
+    </div>
+  </aside>
+
+  <script>
+    // Lee token de la query y arma la URL final hacia /setup/
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token') || 'DEMO123';
+    const setupURL = `${location.origin}/setup/?token=${encodeURIComponent(token)}`;
+    document.getElementById('the-url').textContent = setupURL;
+
+    // Copiar al portapapeles
+    document.getElementById('copy').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(setupURL);
+        const btn = document.getElementById('copy');
+        const prev = btn.textContent;
+        btn.textContent = 'Copiado ✓';
+        setTimeout(()=>btn.textContent=prev, 1200);
+      } catch {}
+    });
+
+    // Ir a Setup (antibobos)
+    document.getElementById('go-setup').addEventListener('click', () => {
+      location.href = setupURL;
+    });
+
+    // Globo de ayuda (misma página)
+    const bubble = document.getElementById('bubble');
+    document.getElementById('open-help').addEventListener('click', () => bubble.classList.add('open'));
+    document.getElementById('close-help').addEventListener('click', () => bubble.classList.remove('open'));
+
+    // Permite abrir directamente con #help
+    if (location.hash === '#help') bubble.classList.add('open');
+  </script>
 </body>
 </html>
