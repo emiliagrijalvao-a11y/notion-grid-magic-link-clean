@@ -3,112 +3,145 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Instagram Grid (Demo)</title>
+  <title>Notion Grid · Vista</title>
   <style>
-    :root { --gap: 10px; }
-    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#0b0b0c; color:#fafafa; }
-    header { padding:14px 16px; background:#0f1115; border-bottom:1px solid #1f2430; position:sticky; top:0; }
-    header .row { display:flex; gap:10px; align-items:center; justify-content:space-between; }
-    input, select { background:#141821; color:#e5e7eb; border:1px solid #263042; border-radius:10px; padding:10px 12px; }
-    main { padding:14px; }
+    :root { --bg:#0b0b0c; --fg:#e8e8e8; --muted:#9aa0a6; --card:#131316; --acc:#8b5cf6; }
+    * { box-sizing: border-box; }
+    body {
+      margin:0; background:var(--bg); color:var(--fg);
+      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    }
+    header {
+      padding:16px 20px; border-bottom:1px solid #232327; position:sticky; top:0; background:rgba(11,11,12,.85); backdrop-filter: blur(8px);
+      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+    }
+    header h1 { margin:0; font-size:18px; }
+    header a { color:var(--muted); text-decoration:none; }
+    header a:hover { color:var(--fg); }
+    .toolbar { margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
+    .toolbar input, .toolbar button {
+      background:#1b1b20; border:1px solid #2a2a30; color:var(--fg); border-radius:8px; padding:8px 10px; font-size:14px;
+    }
+    .toolbar button { cursor:pointer; }
+    main { padding:20px; max-width:1200px; margin:0 auto; }
     .grid {
-      display:grid; gap: var(--gap);
-      grid-template-columns: repeat(3, 1fr);
+      display:grid; grid-template-columns: repeat(1, minmax(0,1fr)); gap:14px;
     }
-    @media (min-width: 920px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+    @media(min-width:640px){ .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media(min-width:960px){ .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); } }
     .card {
-      background:#0f1115; border:1px solid #1f2430; border-radius:14px; overflow:hidden; position:relative;
-      aspect-ratio: 1/1;
-      display:flex; align-items:center; justify-content:center;
+      background:var(--card); border:1px solid #232327; border-radius:14px; overflow:hidden;
+      display:flex; flex-direction:column; min-height:280px;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
     }
-    .card img { width:100%; height:100%; object-fit:cover; display:block; }
-    .badge {
-      position:absolute; left:8px; top:8px; background:rgba(0,0,0,.55); color:#eee;
-      padding:4px 8px; border-radius:999px; font-size:12px; backdrop-filter: blur(4px);
-      border:1px solid rgba(255,255,255,.1);
+    .card:hover { transform: translateY(-2px); border-color:#2f2f34; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+    .media { aspect-ratio: 1 / 1; width:100%; background:#0f0f12; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .media img, .media video { width:100%; height:100%; object-fit:cover; display:block; }
+    .body { padding:12px 14px 14px; display:flex; flex-direction:column; gap:6px; }
+    .title { font-size:15px; line-height:1.4; font-weight:600; }
+    .cap { font-size:13px; color:var(--muted); white-space:pre-line; }
+    .row { display:flex; gap:8px; margin-top:6px; }
+    .btn {
+      appearance:none; border:1px solid #2a2a30; background:#1b1b20; color:var(--fg);
+      border-radius:10px; padding:8px 10px; font-size:13px; cursor:pointer; text-decoration:none;
     }
-    .hover {
-      position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:stretch;
-      background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0));
-      opacity:0; transition:opacity .25s;
-    }
-    .card:hover .hover { opacity:1; }
-    .hover .cap {
-      width:100%; padding:10px; font-size:12px; color:#d1d5db; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    a { color:inherit; text-decoration:none; }
-    .muted { color:#9ca3af; }
-    .err { color:#fca5a5; }
-    footer { padding:16px; text-align:center; color:#6b7280; }
+    .btn:hover { border-color:#3a3a41; }
+    .buy { border-color: #3c2a83; background: #201a3b; color:#d9d3ff; }
+    footer { text-align:center; color:var(--muted); font-size:12px; padding:20px; }
+    .empty { color:var(--muted); text-align:center; padding:40px 10px; border:1px dashed #2a2a30; border-radius:14px; }
   </style>
 </head>
 <body>
   <header>
-    <div class="row">
-      <div>
-        <strong>Instagram Grid (Demo)</strong>
-        <span id="mode" class="muted"></span>
-      </div>
-      <div style="display:flex; gap:8px;">
-        <input id="token" placeholder="token (opcional)" />
-        <button id="go">Cargar</button>
-      </div>
+    <h1>Notion Grid</h1>
+    <a href="/">Inicio</a>
+    <div class="toolbar">
+      <input id="token" placeholder="token (opcional)" />
+      <button id="load">Cargar</button>
     </div>
   </header>
 
   <main>
-    <div id="status" class="muted">Cargando…</div>
-    <div id="grid" class="grid" style="margin-top:12px;"></div>
+    <div id="grid" class="grid" aria-live="polite"></div>
+    <div id="empty" class="empty" style="display:none">No hay elementos para mostrar.</div>
   </main>
 
-  <footer>
-    <small>Demo UX (sin BD). En Fase B guardamos clientes/tokens en Supabase.</small>
-  </footer>
+  <footer>© 2025 Flujo Creativo</footer>
 
   <script>
-    const qs = new URLSearchParams(location.search);
+    const q = new URLSearchParams(location.search);
     const tokenInput = document.getElementById('token');
-    tokenInput.value = qs.get('token') || '';
-    const mode = document.getElementById('mode');
-    const status = document.getElementById('status');
-    const grid = document.getElementById('grid');
+    const gridEl = document.getElementById('grid');
+    const emptyEl = document.getElementById('empty');
 
-    function card(item) {
-      const a = document.createElement('a');
-      a.className = 'card';
-      a.href = item.href || '#';
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.innerHTML = `
-        <span class="badge">${(item.title || 'Post')}</span>
-        <img src="${item.image}" alt="${(item.title||'')}" loading="lazy">
-        <div class="hover"><div class="cap">${item.caption || ''}</div></div>
-      `;
-      return a;
-    }
+    tokenInput.value = q.get('token') || '';
 
-    async function load() {
-      grid.innerHTML = '';
-      status.textContent = 'Cargando…';
+    document.getElementById('load').addEventListener('click', () => {
       const t = tokenInput.value.trim();
-      const url = t ? \`/api/grid?token=\${encodeURIComponent(t)}\` : '/api/grid';
-      mode.textContent = t ? '· Modo personalizado' : '· Modo por defecto';
+      const url = t ? `/api/grid?token=${encodeURIComponent(t)}` : '/api/grid';
+      load(url);
+      const next = new URL(location.href);
+      if (t) next.searchParams.set('token', t); else next.searchParams.delete('token');
+      history.replaceState(null, '', next);
+    });
+
+    function isVideo(url){ return typeof url === 'string' && /\.(mp4|mov|webm)(\?|$)/i.test(url); }
+
+    async function load(url) {
+      gridEl.innerHTML = '';
+      emptyEl.style.display = 'none';
       try {
-        const r = await fetch(url);
-        const j = await r.json();
-        if (!r.ok || !j.ok) {
-          status.innerHTML = '<span class="err">Error:</span> ' + (j.message || r.statusText);
+        const res = await fetch(url, { cache:'no-store' });
+        const data = await res.json();
+        if (!data || !Array.isArray(data.items) || data.items.length === 0){
+          emptyEl.style.display = 'block';
           return;
         }
-        status.textContent = \`\${j.count} items\`;
-        j.items.forEach(it => grid.appendChild(card(it)));
+        for (const item of data.items) {
+          const card = document.createElement('article'); card.className = 'card';
+          const media = document.createElement('div'); media.className = 'media';
+
+          if (item.image && isVideo(item.image)) {
+            const v = document.createElement('video'); v.src = item.image; v.muted = true; v.autoplay = true; v.loop = true; v.playsInline = true;
+            media.appendChild(v);
+          } else if (item.image) {
+            const img = document.createElement('img'); img.src = item.image; img.alt = item.title || 'post';
+            media.appendChild(img);
+          } else {
+            media.textContent = 'Sin imagen';
+          }
+
+          const body = document.createElement('div'); body.className = 'body';
+          const title = document.createElement('div'); title.className = 'title'; title.textContent = item.title || 'Sin título';
+          const cap = document.createElement('div'); cap.className = 'cap'; cap.textContent = item.caption || '';
+
+          const row = document.createElement('div'); row.className = 'row';
+          if (item.href) {
+            const a = document.createElement('a'); a.className = 'btn'; a.textContent = 'Abrir';
+            a.href = item.href.split('\n')[0].trim(); a.target = '_blank'; a.rel = 'noopener';
+            row.appendChild(a);
+          }
+          // Botón de compra (placeholder). Luego lo conectamos a Shopify.
+          const buy = document.createElement('button'); buy.className = 'btn buy'; buy.textContent = 'Comprar';
+          buy.addEventListener('click', () => {
+            // TODO: Reemplazar con URL de Shopify por item (p. ej. variantId)
+            alert('Conectar a Shopify aquí (siguiente paso)');
+          });
+          row.appendChild(buy);
+
+          body.append(title, cap, row);
+          card.append(media, body);
+          gridEl.appendChild(card);
+        }
       } catch (e) {
-        status.innerHTML = '<span class="err">Excepción:</span> ' + String(e);
+        emptyEl.style.display = 'block';
+        console.error(e);
       }
     }
 
-    document.getElementById('go').onclick = load;
-    load();
+    // Auto-cargar al abrir
+    const initial = tokenInput.value ? `/api/grid?token=${encodeURIComponent(tokenInput.value)}` : '/api/grid';
+    load(initial);
   </script>
 </body>
 </html>
