@@ -24,7 +24,7 @@
   <header><a href="/">← Volver</a></header>
   <div class="wrap">
     <h1>Activar Widget</h1>
-    <p>Demo de Magic Link (solo UI). Sustituye la llamada por tu endpoint real cuando lo tengas listo.</p>
+    <p>Demo de Magic Link (solo UI). Reemplaza la generación local por tu backend cuando esté listo.</p>
 
     <form id="f">
       <label>Email del comprador
@@ -37,11 +37,14 @@
     </form>
 
     <div id="out" class="out"></div>
-    <p class="mini">Cuando tengas tu backend, este formulario puede llamar a <code>/api/activate</code> y devolver
-      una URL tipo: <code>https://tu-dominio.com/widgets/xxxx/setup?token=YYYY</code>.</p>
+    <p class="mini">
+      Instrucción en UI: este formulario puede llamar a un <code>POST /api/activate</code> propio y devolver
+      una URL tipo <code>https://tu-dominio.com/widgets/xxxx/setup?token=YYYY</code>.
+    </p>
   </div>
 
   <script>
+    // Generación local de link de ejemplo (sustituir por tu API real)
     const $f = document.getElementById("f");
     const $out = document.getElementById("out");
 
@@ -50,15 +53,14 @@
       const email = document.getElementById("email").value.trim();
       const plan = document.getElementById("plan").value.trim() || "instagram-grid-basic";
 
-      // DEMO: genera un link local. Reemplaza por tu POST /api/activate real.
       const token = crypto.randomUUID().replace(/-/g, "").slice(0, 24).toUpperCase();
       const link = `${location.origin}/grid.html#token=${token}&email=${encodeURIComponent(email)}&plan=${encodeURIComponent(plan)}`;
 
       $out.innerHTML = `
-        <div><strong>Success</strong> — Here's your setup link:</div>
+        <div><strong>Success</strong> — Setup link:</div>
         <div style="margin-top:8px;"><code>${link}</code></div>
         <div style="margin-top:8px;">
-          <a href="${link}" target="_blank" rel="noopener">Go to Setup →</a>
+          <a href="${link}" target="_blank" rel="noopener">Abrir →</a>
         </div>
       `;
     });
