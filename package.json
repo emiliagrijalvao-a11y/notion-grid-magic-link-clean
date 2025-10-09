@@ -2,11 +2,7 @@
   "name": "notion-grid-magic-link",
   "version": "1.0.0",
   "type": "module",
-  "private": true,
   "scripts": {
     "build": "echo \"no build\""
-  },
-  "dependencies": {
-    "@notionhq/client": "2.2.15"
   }
 }
