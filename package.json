@@ -1,8 +1,12 @@
 {
-  "name": "notion-grid-magic-link",
+  "name": "notion-grid-demo",
   "version": "1.0.0",
   "type": "module",
+  "private": true,
   "scripts": {
-    "build": "echo \"no build\""
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
   }
 }
