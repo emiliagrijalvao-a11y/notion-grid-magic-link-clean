@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Magic Link · Flujo Creativo</title>
+
+  <!-- Tipografías -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ───────── Tokens de diseño (colores/typos) ───────── */
+    :root{
+      --bg-beige:#D9D9D9;         /* Fondo */
+      --tile:#ECEBE8;              /* Tarjetas/botón claro */
+      --black:#000;                /* Botón destacado */
+      --white:#fff;
+      --text:#000;
+
+      --font-heading:"Oswald",sans-serif;
+      --font-body:"Inter",sans-serif;
+
+      --w-regular:400;
+      --w-medium:500;
+      --w-semibold:600;
+
+      --radius:0px;               /* Bordes cuadrados */
+      --gap:18px;
+      --maxw:860px;
+    }
+
+    /* ───────── Reset mínimo ───────── */
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg-beige);
+      color:var(--text);
+      font: var(--w-regular) 16px/1.5 var(--font-body);
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{color:inherit; text-decoration:none}
+    button{font:inherit}
+
+    /* ───────── Shell editorial (columna central) ───────── */
+    .wrap{
+      min-height:100vh;
+      display:grid;
+      grid-template-columns: 1fr minmax(320px,var(--maxw)) 1fr;
+      grid-template-rows: auto 1fr auto;
+    }
+    .center{grid-column:2; padding:56px 20px 24px}
+
+    /* ───────── Encabezados y microcopy ───────── */
+    .title{
+      font-family:var(--font-heading);
+      font-weight:var(--w-semibold);
+      text-transform:uppercase;
+      letter-spacing:.02em;
+      font-size:clamp(1.8rem,4.8vw,3.2rem);
+      line-height:1.05;
+      margin:0 0 .35em;
+      text-align:center;
+    }
+    .lead{
+      max-width:46ch;
+      margin:0 auto 28px;
+      text-align:center;
+      font-size:clamp(.95rem,2.2vw,1.05rem);
+      color:rgba(0,0,0,.8);
+    }
+
+    /* ───────── Tarjeta del link ───────── */
+    .card{
+      background:var(--tile);
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:var(--radius);
+      padding:20px;
+      margin:0 auto 22px;
+      display:grid; gap:12px;
+    }
+    .url{
+      font-family:var(--font-body);
+      font-weight:var(--w-medium);
+      word-break:break-all;
+      background:var(--white);
+      border:1px solid rgba(0,0,0,.15);
+      border-radius:var(--radius);
+      padding:12px 14px;
+      display:block;
+    }
+    .actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:.5rem;
+      padding:12px 14px;
+      border-radius:var(--radius);
+      border:1px solid rgba(0,0,0,.16);
+      cursor:pointer; user-select:none;
+      transition:transform .04s ease;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    .btn-plain{
+      background:var(--tile);
+      color:var(--black);
+    }
+    .btn-primary{
+      background:var(--black);
+      border-color:var(--black);
+      color:var(--white);
+    }
+
+    /* ───────── Footer / Help ───────── */
+    .foot{
+      grid-column:2;
+      padding:20px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; flex-wrap:wrap;
+      font-size:.78rem; color:rgba(0,0,0,.75);
+    }
+    .help-trigger{
+      background:transparent; border:none; padding:6px 8px;
+      cursor:pointer; font:inherit; color:inherit; text-decoration:underline;
+    }
+
+    /* ───────── Globo de ayuda ───────── */
+    .help-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.25);
+      display:none; place-items:center; padding:24px;
+      z-index:50;
+    }
+    .help-backdrop[aria-hidden="false"]{ display:grid; }
+
+    .help-panel{
+      width:min(820px,100%);
+      background:var(--tile);
+      border:1px solid rgba(0,0,0,.18);
+      border-radius:var(--radius);
+      max-height:80vh; overflow:auto;
+      padding:18px 18px 8px;
+      position:relative;
+    }
+    .help-head{
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      margin:2px 0 8px;
+    }
+    .help-title{
+      font-family:var(--font-heading);
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-size:1.05rem;
+      margin:0;
+    }
+    .help-close{
+      background:transparent; border:none; cursor:pointer; padding:6px 8px;
+      font: var(--w-medium) 1rem var(--font-body);
+    }
+    .faq{ display:grid; gap:14px; padding:6px 2px 16px;}
+    .faq dt{
+      font-weight:var(--w-semibold);
+      letter-spacing:.02em;
+    }
+    .faq dd{
+      margin:0 0 12px; color:rgba(0,0,0,.85);
+    }
+
+    /* ───────── Arrow link (→ / ←) ───────── */
+    .link-arrow{ display:inline-flex; align-items:center; gap:.45rem; text-decoration:none; color:inherit; }
+    .link-arrow .arrow{ display:inline-block; transform:translateX(0); transition:transform .15s ease; }
+    .link-arrow:hover .arrow{ transform:translateX(3px); }
+    .link-arrow.rev:hover .arrow{ transform:translateX(-3px); }
+
+    /* Utilidades */
+    .mt8{margin-top:8px}
+    .mt16{margin-top:16px}
+    .centered{ text-align:center; }
+
+    @media (max-width:640px){
+      .foot{ justify-content:center; gap:8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- CONTENIDO CENTRAL -->
+    <main class="center">
+      <h1 class="title">Aquí está tu link para configurar <span aria-hidden="true">◡̈</span></h1>
+      <p class="lead">
+        Guarda esta URL única en un lugar seguro — la usarás cada vez que crees un widget.
+        Piénsala como tu acceso personal.
+      </p>
+
+      <section class="card" aria-label="Tu URL de configuración">
+        <a id="setupLink" class="url" href="#" target="_blank" rel="noopener">https://…/setup?token=…</a>
+
+        <div class="actions">
+          <button id="copyBtn" class="btn btn-plain" type="button">Copy URL</button>
+          <a id="goBtn" class="btn btn-primary" href="#" target="_blank" rel="noopener">
+            Comenzar el setup del grid <span class="arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <p class="centered mt8">
+        <a class="link-arrow rev" href="/"><span class="arrow">←</span> Volver al inicio</a>
+      </p>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="foot">
+      <small>© 2025 Flujo Creativo · Sistema Notion Grid</small>
+      <button id="helpBtn" class="help-trigger" type="button">¿Necesitas ayuda?</button>
+    </footer>
+  </div>
+
+  <!-- GLOBO DE AYUDA -->
+  <div id="help" class="help-backdrop" aria-hidden="true">
+    <aside class="help-panel" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+      <header class="help-head">
+        <h2 id="helpTitle" class="help-title">Ayuda rápida</h2>
+        <button class="help-close link-arrow rev" type="button" id="closeHelp">
+          <span class="arrow">←</span> Cerrar
+        </button>
+      </header>
+
+      <dl class="faq">
+        <dt>¿Dónde encuentro mi Magic Link?</dt>
+        <dd>
+          Lo enviamos al correo usado en tu compra. Revisa tu carpeta de spam y busca mensajes de “Flujo Creativo”.
+        </dd>
+
+        <dt>Perdí mi Magic Link, ¿y ahora?</dt>
+        <dd>
+          Repite el flujo de activación con el mismo correo de compra y recibirás exactamente la misma URL de setup.
+        </dd>
+
+        <dt>Me aparece “este email no está registrado”.</dt>
+        <dd>
+          Asegúrate de usar el <em>mismo</em> correo con el que realizaste la compra (coincide con el recibo).
+        </dd>
+
+        <dt>Necesito soporte.</dt>
+        <dd>
+          Escríbenos a <a href="mailto:soporte@flujocreativo.com">soporte@flujocreativo.com</a>.
+          <!-- TODO: si tu email de soporte es otro, cámbialo aquí -->
+        </dd>
+      </dl>
+    </aside>
+  </div>
+
+  <script>
+    // Deriva la URL de setup desde la query (?url=... o ?token=...)
+    (function(){
+      const usp = new URLSearchParams(location.search);
+      let setupURL = usp.get('url');
+
+      if(!setupURL){
+        const token = usp.get('token');
+        if(token){
+          setupURL = location.origin + '/setup?token=' + encodeURIComponent(token);
+        }
+      }
+      if(!setupURL){
+        // Fallback de demo
+        setupURL = location.origin + '/setup?token=DEMO-TOKEN';
+      }
+
+      const linkEl = document.getElementById('setupLink');
+      const goBtn  = document.getElementById('goBtn');
+      const copyBtn= document.getElementById('copyBtn');
+
+      linkEl.textContent = setupURL;
+      linkEl.href = setupURL;
+      goBtn.href  = setupURL;
+
+      copyBtn.addEventListener('click', async () => {
+        try{
+          await navigator.clipboard.writeText(setupURL);
+          const prev = copyBtn.textContent;
+          copyBtn.textContent = 'Copiado ✓';
+          setTimeout(()=>copyBtn.textContent = prev, 1300);
+        }catch(e){
+          // Fallback: selección manual
+          const r = document.createRange();
+          r.selectNodeContents(linkEl);
+          const sel = getSelection();
+          sel.removeAllRanges(); sel.addRange(r);
+          alert('Seleccioné la URL. Presiona ⌘/Ctrl+C para copiar.');
+        }
+      });
+
+      // Help toggle
+      const help = document.getElementById('help');
+      const helpBtn = document.getElementById('helpBtn');
+      const closeHelp = document.getElementById('closeHelp');
+
+      function openHelp(){ help.setAttribute('aria-hidden','false'); }
+      function close(){ help.setAttribute('aria-hidden','true'); }
+
+      helpBtn.addEventListener('click', openHelp);
+      closeHelp.addEventListener('click', close);
+      help.addEventListener('click', (e)=>{
+        if(e.target === help) close();
+      });
+      window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') close(); });
+    })();
+  </script>
+</body>
+</html>
