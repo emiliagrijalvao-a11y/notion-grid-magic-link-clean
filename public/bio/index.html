@@ -7,40 +7,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Oswald:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    :root{
-      --beige:#D9D9D9; --tile:#ECEBE8; --black:#000; --white:#fff;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    :root{ --beige:#D9D9D9; --tile:#ECEBE8; --black:#000; --white:#fff; }
+    *{box-sizing:border-box} html,body{height:100%}
     body{margin:0;background:var(--white);color:var(--black);font-family:"Inter",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
-    .wrap{max-width:680px;margin:0 auto;padding:32px 16px}
-
-    /* Header brand sutil */
+    .wrap{max-width:680px;margin:0 auto;padding:24px 16px}
     .brand{font-family:"Oswald",sans-serif;letter-spacing:.5px;text-transform:uppercase;font-size:14px;opacity:.65;margin-bottom:12px}
-
-    /* Perfil */
     .card{background:var(--tile);border:1px solid rgba(0,0,0,.12);padding:22px}
     .profile{display:flex;gap:18px;align-items:center}
     .avatar{width:86px;height:86px;border-radius:50%;object-fit:cover;background:#f6f6f6;border:1px solid rgba(0,0,0,.12)}
     .name{font-family:"Oswald",sans-serif;font-size:28px;line-height:1;margin:0 0 6px}
     .user{font-size:13px;color:#555}
     .bio{margin-top:10px;font-size:14px;line-height:1.6;color:#222}
-
-    /* Links */
     .links{margin-top:18px;display:flex;flex-direction:column;gap:10px}
-    .btn{
-      display:block;width:100%;text-align:center;text-decoration:none;cursor:pointer;
-      padding:14px 16px;border:1px solid rgba(0,0,0,.22);background:var(--white);color:var(--black);
-    }
+    .btn{display:block;width:100%;text-align:center;text-decoration:none;cursor:pointer;padding:14px 16px;border:1px solid rgba(0,0,0,.22);background:var(--white);color:var(--black)}
     .btn:hover{background:#f7f7f7}
     .btn-primary{background:var(--black);color:var(--white);border-color:var(--black)}
     .btn-primary:hover{opacity:.92}
-
-    /* Socials opcional */
     .socials{display:flex;gap:10px;margin-top:12px}
     .chip{font-size:12px;border:1px solid rgba(0,0,0,.22);padding:6px 10px;background:#fff;color:#000;text-decoration:none}
-
-    /* Error */
     .error{margin-top:12px;background:#ffe9e9;border:1px solid #f3bcbc;color:#a40000;padding:12px}
     .muted{font-size:12px;color:#666;margin-top:12px}
   </style>
@@ -61,9 +45,7 @@
       </div>
 
       <p class="bio" id="about"></p>
-
       <div class="links" id="links"></div>
-
       <div class="muted" id="wid"></div>
     </div>
   </div>
@@ -72,14 +54,14 @@
     const esc = s => (s||"").toString().replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
     function err(m){document.getElementById("errors").innerHTML = `<div class="error">${esc(m)}</div>`}
 
-    // Soportar rutas tipo /bio/<id>
-    const bioId = (location.pathname.split("/")[2] || "").trim();
-    const wid = document.getElementById("wid");
-    if (bioId) wid.textContent = "ID: " + bioId;
+    // slug desde /bio/<slug>
+    const slug = (location.pathname.split("/")[2] || "").trim();
+    if (slug) document.getElementById("wid").textContent = "ID: " + slug;
 
     async function load(){
       try{
-        const r = await fetch("/api/bio", { headers:{Accept:"application/json"} });
+        const url = slug ? `/api/bio?slug=${encodeURIComponent(slug)}` : `/api/bio`;
+        const r = await fetch(url, { headers:{Accept:"application/json"} });
         if(!r.ok) throw new Error("La API /api/bio no respondió OK");
         const j = await r.json();
         if (!j.ok) throw new Error(j.error || "Respuesta inválida");
@@ -88,29 +70,23 @@
         const links = Array.isArray(j.links)? j.links : [];
 
         document.getElementById("avatar").src = p.avatar || "https://picsum.photos/seed/bio/200/200";
-        document.getElementById("avatar").alt = p.name || "Avatar";
         document.getElementById("name").textContent = p.name || "";
         document.getElementById("username").textContent = p.username ? "@"+p.username : "";
         document.getElementById("about").textContent = p.bio || "";
 
-        // Social chips opcionales
-        const socials = document.getElementById("socials");
-        socials.innerHTML = "";
+        const socials = document.getElementById("socials"); socials.innerHTML = "";
         (p.socials || []).forEach(s=>{
           const a = document.createElement("a");
-          a.className = "chip";
-          a.href = s.href; a.target = "_blank"; a.rel = "noopener";
-          a.textContent = s.label;
+          a.className = "chip"; a.href = s.href; a.target = "_blank"; a.rel = "noopener";
+          a.textContent = s.label || s.href;
           socials.appendChild(a);
         });
 
-        const L = document.getElementById("links");
-        L.innerHTML = "";
+        const L = document.getElementById("links"); L.innerHTML = "";
         links.forEach((it,idx)=>{
           const a = document.createElement("a");
           a.className = "btn" + (idx===0 ? " btn-primary" : "");
-          a.href = it.href || "#";
-          if (it.href) { a.target="_blank"; a.rel="noopener"; }
+          a.href = it.href || "#"; if (it.href) { a.target="_blank"; a.rel="noopener"; }
           a.textContent = it.label || "Abrir";
           L.appendChild(a);
         });
