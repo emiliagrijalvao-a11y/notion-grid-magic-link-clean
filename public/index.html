@@ -1,253 +1,128 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Flujo Creativo · Notion Grid</title>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Flujo Creativo · URL de configuración</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --beige:#D9D9D9;   /* fondo */
+      --tile:#ECEBE8;    /* tarjetas/boxes */
+      --black:#000000;
+      --white:#ffffff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:var(--beige);color:var(--black);
+      font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    }
+    .wrap{max-width:900px;margin:0 auto;padding:40px 20px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+    .brand{font-family:"Oswald",sans-serif;letter-spacing:.5px;font-size:22px;text-transform:uppercase}
 
-    <!-- Tipografías -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet" />
+    .hero{
+      background:linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.15));
+      border:1px solid rgba(0,0,0,.12);padding:40px 28px;margin-bottom:18px;
+    }
+    h1{font-family:"Oswald",sans-serif;font-size:34px;margin:0 0 10px}
+    p{margin:0 0 14px;line-height:1.6}
+    .url-box{
+      background:var(--tile);border:1px solid rgba(0,0,0,.25);
+      padding:16px;margin:14px 0;font-family:ui-monospace,monospace;font-size:14px;word-break:break-all;
+    }
+    .btn{background:var(--black);color:var(--white);border:none;padding:12px 18px;font-size:14px;cursor:pointer;text-decoration:none;display:inline-block}
+    .btn:hover{opacity:.92}
+    .btn-secondary{background:var(--tile);color:var(--black);border:1px solid rgba(0,0,0,.35)}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
 
-    <style>
-      :root{
-        --beige:#D9D9D9;            /* fondo */
-        --tile:#ECEBE8;             /* “cuadritos” y botones claros */
-        --black:#000000;
-        --white:#ffffff;
-      }
-      *{box-sizing:border-box}
-      html,body{height:100%}
-      body{
-        margin:0;
-        font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-        color:var(--black);
-        background:var(--beige);
-        -webkit-font-smoothing:antialiased;
-        text-rendering:optimizeLegibility;
-      }
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:12px;opacity:.85}
+    a{color:var(--black);text-decoration:underline}
+    a:hover{opacity:.75}
 
-      /* Layout minimal 90s/editorial */
-      .wrap{
-        max-width:960px;
-        margin:0 auto;
-        padding:48px 20px 80px;
-      }
-      header{
-        display:flex;align-items:center;justify-content:space-between;
-        margin-bottom:32px;
-      }
-      .brand{
-        font-family:"Oswald",sans-serif;
-        letter-spacing:.5px;
-        font-size:22px;
-        text-transform:uppercase;
-      }
+    /* Ayuda (globo) */
+    .help-pop{
+      display:none;position:relative;margin-top:10px
+    }
+    .help-card{
+      background:var(--tile);border:1px solid rgba(0,0,0,.25);padding:16px
+    }
+    .faq-item{border-bottom:1px solid rgba(0,0,0,.1);padding:10px 0}
+    .faq-item:last-child{border-bottom:none}
+    .faq-item h3{margin:0 0 6px;font-size:15px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">Flujo Creativo</div>
+    </header>
 
-      .card{
-        background:linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.15));
-        border:1px solid rgba(0,0,0,.12);
-        padding:40px 28px;
-      }
+    <main class="hero">
+      <h1>Aquí encuentras tu URL de configuración</h1>
+      <p>Guárdala: la usarás cada vez que crees un widget. Piénsalo como tu acceso personal al setup.</p>
 
-      h1{
-        font-family:"Oswald",sans-serif;
-        font-weight:600;
-        font-size:42px;
-        line-height:1.05;
-        margin:0 0 8px;
-        text-align:center;
-        text-transform:none;
-      }
-      .sub{
-        max-width:720px;margin:0 auto 28px;
-        text-align:center;font-size:16px;line-height:1.55;
-      }
+      <div id="setup-url" class="url-box">/setup.html</div>
 
-      /* Caja del enlace */
-      .url-box{
-        background:var(--tile);
-        border:1px solid rgba(0,0,0,.18);
-        padding:18px;
-        font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-        font-size:15px;
-        overflow:auto;
-        white-space:nowrap;
-      }
+      <div class="row">
+        <button id="copy-btn" class="btn btn-secondary">Copiar URL</button>
+        <a id="go-setup" class="btn" href="/setup.html">Comenzar el Setup del Grid →</a>
+      </div>
 
-      /* Botones cuadrados */
-      .actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap}
-      .btn{
-        border:1px solid rgba(0,0,0,.85);
-        background:var(--tile);
-        color:var(--black);
-        padding:12px 16px;
-        font-size:14px;
-        letter-spacing:.2px;
-        text-decoration:none;
-        cursor:pointer;
-        border-radius:0; /* cuadrado */
-        min-width:150px;
-        text-align:center;
-      }
-      .btn:focus{outline:2px dashed var(--black);outline-offset:2px}
-      .btn-primary{
-        background:var(--black);
-        color:var(--white);
-      }
+      <footer>
+        <div>© 2025 Flujo Creativo · Sistema Notion Grid</div>
+        <a href="#" id="need-help">¿Necesitas ayuda?</a>
+      </footer>
 
-      /* Footer mini editorial */
-      footer{
-        display:flex;justify-content:space-between;align-items:center;
-        gap:12px;margin-top:22px;font-size:12px;opacity:.8;
-      }
-      .help-link{color:var(--black);text-decoration:underline;cursor:pointer}
-
-      /* Globo de ayuda */
-      .help{
-        position:fixed;right:22px;bottom:22px;width:min(560px,92vw);
-        background:var(--tile);
-        border:1px solid rgba(0,0,0,.2);
-        box-shadow:0 10px 30px rgba(0,0,0,.18);
-        transform:translateY(12px);opacity:0;pointer-events:none;
-        transition:.2s ease;
-      }
-      .help.open{transform:translateY(0);opacity:1;pointer-events:auto}
-      .help header{
-        padding:12px 14px;border-bottom:1px solid rgba(0,0,0,.12);
-        display:flex;align-items:center;gap:10px;justify-content:space-between
-      }
-      .help header .title{font-weight:600}
-      .help .close{
-        background:none;border:0;color:var(--black);font-size:18px;cursor:pointer
-      }
-      .help .body{padding:14px 16px;max-height:min(70vh,620px);overflow:auto}
-      .faq h3{font-size:15px;margin:14px 0 6px;font-weight:700}
-      .faq p{margin:0 0 10px;font-size:14px;line-height:1.5}
-      .kbd{font-family:ui-monospace,monospace;background:#f4f4f4;border:1px solid #ddd;padding:1px 4px}
-
-      /* Alerta de “copiado” */
-      .toast{
-        position:fixed;left:50%;bottom:28px;transform:translateX(-50%);
-        background:var(--black);color:var(--white);padding:10px 14px;
-        font-size:13px;opacity:0;border-radius:0;transition:.2s ease;
-      }
-      .toast.show{opacity:1}
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <header>
-        <div class="brand">Flujo Creativo</div>
-        <!-- sin botón “Inicio” (esta es la principal) -->
-      </header>
-
-      <section class="card">
-        <h1>Aquí puedes encontrar tu enlace de configuración</h1>
-        <p class="sub">
-          Guarda este URL único en un lugar seguro — lo usarás cada vez que crees un widget.
-          Piénsalo como tu acceso personal al Setup.
-        </p>
-
-        <div id="url" class="url-box" tabindex="0" aria-label="Enlace de configuración">
-          <!-- se inyecta por JS -->
-        </div>
-
-        <div class="actions">
-          <button id="copy" class="btn" type="button">Copiar URL</button>
-          <a id="go" class="btn btn-primary" href="#" rel="nofollow">Comenzar el Setup →</a>
-        </div>
-
-        <footer>
-          <div>© 2025 Flujo Creativo · Sistema Notion Grid</div>
-          <div class="help-link" id="ask">¿Necesitas ayuda?</div>
-        </footer>
-      </section>
-    </div>
-
-    <!-- Globo/ayuda -->
-    <aside id="help" class="help" role="dialog" aria-modal="true" aria-labelledby="help-title">
-      <header>
-        <div id="help-title" class="title">Ayuda rápida</div>
-        <button class="close" id="closeHelp" type="button">← cerrar</button>
-      </header>
-      <div class="body">
-        <div class="faq">
-          <h3>¿Dónde encuentro mi enlace de configuración?</h3>
-          <p>
-            Tras la compra en Shopify recibirás un correo de confirmación de <strong>Flujo Creativo</strong> con tu
-            <em>Setup URL</em>. Si no lo ves, revisa spam/promociones y busca por “Flujo Creativo”.
-          </p>
-
-          <h3>Perdí mi enlace. ¿Qué hago?</h3>
-          <p>
-            Abre de nuevo el correo de confirmación de tu pedido y utiliza el botón de acceso.
-            Si aún no lo encuentras, escríbenos a
-            <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a> y te lo reenviaremos.
-          </p>
-
-          <h3>Me dice “email no registrado”.</h3>
-          <p>
-            Asegúrate de usar exactamente el mismo correo con el que hiciste la compra en Shopify.
-            Si cambiaste de correo, contáctanos para actualizarlo.
-          </p>
-
-          <h3>¿Cómo obtengo soporte?</h3>
-          <p>
-            Mándanos un email a <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a>.
-            Respondemos en días hábiles.
-          </p>
+      <div id="help" class="help-pop">
+        <div class="help-card">
+          <div class="faq-item">
+            <h3>No encuentro mi compra / correo</h3>
+            <p>Las compras se gestionan en Shopify. Busca el email de confirmación en tu bandeja (también spam/promociones). Usa el mismo correo para activar tu cuenta.</p>
+          </div>
+          <div class="faq-item">
+            <h3>Perdí mi URL de configuración</h3>
+            <p>Escríbeme a <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a> desde el mismo correo de compra y te la reenvío.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Cómo actualizo a Pro?</h3>
+            <p>Compra la versión Pro en Shopify con el mismo correo. Al recargar, tu plan pasa a Pro automáticamente.</p>
+          </div>
+          <div class="faq-item">
+            <h3>¿Soporte?</h3>
+            <p>Correo directo: <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a></p>
+          </div>
         </div>
       </div>
-    </aside>
+    </main>
+  </div>
 
-    <div id="toast" class="toast" role="status" aria-live="polite">Copiado</div>
+  <script>
+    // Construye URL interna de setup (relativa y segura)
+    const qs = new URLSearchParams(location.search);
+    const token = qs.get('token') || '';
+    const baseSetup = '/setup.html' + (token ? `?token=${encodeURIComponent(token)}` : '');
+    document.getElementById('setup-url').textContent = location.origin + baseSetup;
+    document.getElementById('go-setup').setAttribute('href', baseSetup);
 
-    <script>
-      // 1) Resolver el Setup URL (query ?setup=... o localStorage)
-      (function(){
-        const q = new URLSearchParams(location.search);
-        const setupFromQuery = q.get("setup");
-        const stored = localStorage.getItem("setupUrl");
-        const fallback = "https://tu-dominio.com/widgets/xxxxx/setup?token=XXXX";
-        const setupUrl = setupFromQuery || stored || fallback;
+    document.getElementById('copy-btn').addEventListener('click', async () => {
+      try{
+        await navigator.clipboard.writeText(document.getElementById('setup-url').textContent);
+        alert('URL copiada');
+      }catch{
+        alert('No se pudo copiar automáticamente. Selecciona y copia.');
+      }
+    });
 
-        // Guardamos si vino por query
-        if (setupFromQuery) localStorage.setItem("setupUrl", setupFromQuery);
-
-        const urlBox = document.getElementById("url");
-        const go = document.getElementById("go");
-        urlBox.textContent = setupUrl;
-        go.href = setupUrl;
-
-        // 2) Copiar
-        document.getElementById("copy").addEventListener("click", async () => {
-          try{
-            await navigator.clipboard.writeText(setupUrl);
-            toast("Copiado");
-          }catch{
-            // Fallback selección manual
-            const r = document.createRange();
-            r.selectNodeContents(urlBox);
-            const sel = window.getSelection();
-            sel.removeAllRanges(); sel.addRange(r);
-            toast("Seleccionado: ⌘/Ctrl+C");
-          }
-        });
-
-        // 3) Ayuda (globo)
-        const help = document.getElementById("help");
-        document.getElementById("ask").addEventListener("click", () => help.classList.add("open"));
-        document.getElementById("closeHelp").addEventListener("click", () => help.classList.remove("open"));
-
-        // 4) Toast
-        window.toast = (msg) => {
-          const t = document.getElementById("toast");
-          t.textContent = msg;
-          t.classList.add("show");
-          setTimeout(()=>t.classList.remove("show"), 1400);
-        };
-      })();
-    </script>
-  </body>
+    const helpToggle = document.getElementById('need-help');
+    helpToggle.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const pop = document.getElementById('help');
+      pop.style.display = (pop.style.display === 'block') ? 'none' : 'block';
+    });
+  </script>
+</body>
 </html>
