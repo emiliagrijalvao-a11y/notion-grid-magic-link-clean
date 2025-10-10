@@ -3,189 +3,164 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Setup · Flujo Creativo</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet" />
+  <title>Widget · Grid</title>
+  <meta name="color-scheme" content="light dark">
   <style>
-    :root{--beige:#D9D9D9;--tile:#ECEBE8;--black:#000;--white:#fff}
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--black);background:var(--beige)}
-    .wrap{max-width:980px;margin:0 auto;padding:32px 20px 80px}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
-    .brand{font-family:"Oswald",sans-serif;letter-spacing:.5px;font-size:22px;text-transform:uppercase}
-    h1{font-family:"Oswald",sans-serif;font-weight:600;font-size:32px;margin:0 0 14px}
-    p{line-height:1.65;margin:0 0 16px}.muted{font-size:14px;color:#333}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,.15));border:1px solid rgba(0,0,0,.12);padding:28px 24px;margin-bottom:20px}
-    .form-row{display:grid;gap:14px;margin:16px 0}.form-group label{display:block;font-weight:600;margin-bottom:8px}
-    .form-group input[type="text"]{width:100%;padding:12px;border:1px solid rgba(0,0,0,.2);background:var(--white);font-size:14px}
-    .form-group input[type="text"]:focus{outline:2px solid var(--black);outline-offset:2px}
-    .toggle{display:flex;align-items:center;gap:10px;margin:10px 0}.toggle input{width:18px;height:18px}
-    .hint{font-size:13px;color:#555;margin-top:6px}
-    .section-title{font-family:"Oswald",sans-serif;font-size:22px;margin:24px 0 8px}
-    .inline-grid{display:grid;gap:12px}@media(min-width:720px){.inline-grid{grid-template-columns:1fr 1fr}}
-    .btn{background:var(--black);color:var(--white);border:none;padding:12px 22px;font-size:14px;cursor:pointer;display:inline-block;text-decoration:none}
-    .btn:hover{opacity:.92}.btn-secondary{background:var(--tile);color:var(--black);border:1px solid rgba(0,0,0,.28)}
-    .btn-row{display:flex;gap:10px;flex-wrap:wrap}
-    .result{display:none;margin-top:18px;padding:18px;background:rgba(0,128,0,.06);border:1px solid rgba(0,128,0,.3)}
-    .result code{display:block;padding:12px;background:var(--white);margin:10px 0;font-family:ui-monospace,monospace}
-    .error{display:none;margin-top:18px;padding:14px;background:rgba(180,0,0,.08);border:1px solid rgba(180,0,0,.35);color:#520000;font-size:14px}
-    .foot{display:flex;align-items:center;justify-content:space-between;margin-top:28px;font-size:12px;color:#222}
-    a{color:var(--black);text-decoration:underline} a:hover{opacity:.8}
+    :root{
+      --bg: transparent;          /* fondo transparente para Notion */
+      --tile: #f3f3f3;
+      --border: #e5e5e5;
+      --text: #111;
+      --overlayText: #fff;
+      --gap: 8px;
+      --radius: 0;                /* look cuadrado tipo IG */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:var(--bg);color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+    }
+
+    .wrap{padding:0;margin:0}
+
+    /* GRID estilo Instagram */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);   /* 3 columnas fijas para “look IG” */
+      gap: var(--gap);
+      width:100%;
+    }
+    @media (max-width: 760px){
+      .grid{ grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .item{
+      position:relative; border:1px solid var(--border); background:var(--tile);
+      overflow:hidden; border-radius:var(--radius);
+      aspect-ratio:1/1; /* cuadrado perfecto */
+    }
+    .ph{
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      font-size:12px; color:#777;
+    }
+    .img{
+      position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+      display:block; background:#ddd;
+    }
+
+    /* overlay con título al pasar mouse, muy sutil */
+    .overlay{
+      position:absolute; left:0; right:0; bottom:0; padding:8px 10px;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 90%);
+      color:var(--overlayText); font-size:12px; line-height:1.3;
+      opacity:0; transition:opacity .15s ease;
+    }
+    .item:hover .overlay{opacity:1}
+
+    /* indicador “clicable” (cuando hay href) */
+    .item.link{ cursor:pointer }
+    .item.link:active{ transform: translateY(1px) }
+
+    /* estados */
+    .state{padding:16px; font-size:14px; color:#666}
+    .visually-hidden{position:absolute!important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px)}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header><div class="brand">Flujo Creativo</div></header>
-
-    <div class="card">
-      <h1>Configura tu Widget de Grid</h1>
-      <p class="muted">Completa y genera tu URL. Luego en Notion usa <strong>/embed</strong> con esa URL.</p>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Notion Integration Token</label>
-          <input id="token-input" type="text" placeholder="secret_xxxxx..." autocomplete="off" />
-          <div class="hint">Crea tu integración en <a target="_blank" href="https://www.notion.so/my-integrations">notion.so/my-integrations</a> y copia el token.</div>
-        </div>
-
-        <div class="form-group">
-          <label>Database URL (fuente)</label>
-          <input id="db-input" type="text" placeholder="https://www.notion.so/tu-workspace/XXXXXXXXXXXX?pvs=4" autocomplete="off" />
-          <div class="hint">Debe ser la URL de la <strong>base de datos real</strong>, abierta en vista de página completa.</div>
-        </div>
-
-        <label class="toggle">
-          <input id="integration-done" type="checkbox" />
-          <span>Ya conecté la integración a esta base de datos en Notion</span>
-        </label>
-      </div>
-
-      <div class="section-title">Opcional: botón BIO</div>
-      <div class="toggle">
-        <input id="bio-enabled" type="checkbox" />
-        <span>Mostrar botón BIO (abre un link)</span>
-      </div>
-      <div class="inline-grid" id="bio-fields" style="display:none">
-        <div class="form-group">
-          <label>Texto del botón (BIO)</label>
-          <input id="bio-text" type="text" placeholder="Ver más" value="Ver más" />
-        </div>
-        <div class="form-group">
-          <label>URL del BIO</label>
-          <input id="bio-url" type="text" placeholder="https://linktr.ee/tuusuario o https://tuweb.com" />
-        </div>
-      </div>
-
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn" id="generate-widget">Generar Widget →</button>
-      </div>
-
-      <div id="error-box" class="error"></div>
-
-      <div id="widget-result" class="result">
-        <strong>¡Widget generado!</strong>
-        <p>Usa esta URL para <code>/embed</code> en Notion:</p>
-        <code id="widget-url">https://…</code>
-        <div class="btn-row">
-          <button class="btn btn-secondary" id="copy-url">Copiar URL</button>
-          <a id="open-url" class="btn" target="_blank" href="#">Probar ahora</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="foot">
-      <span>© 2025 Flujo Creativo · Sistema Notion Grid</span>
-      <a href="/index.html">Volver a inicio</a>
-    </div>
+    <div id="state" class="state">Cargando…</div>
+    <div id="grid" class="grid" hidden></div>
   </div>
 
   <script>
-    const bioEnabled = document.getElementById('bio-enabled');
-    const bioFields = document.getElementById('bio-fields');
-    bioEnabled.addEventListener('change', () => {
-      bioFields.style.display = bioEnabled.checked ? 'grid' : 'none';
-    });
+    // ========= Helpers =========
+    const qs = new URLSearchParams(location.search);
+    const forwardParams = (() => {
+      // Reenviamos TODOS los params (id, db, limit, etc.) a /api/grid para no romper flujos existentes.
+      const arr = [];
+      for (const [k,v] of qs.entries()) arr.push(`${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
+      return arr.length ? `?${arr.join("&")}` : "";
+    })();
 
-    function extractDbId(url){
+    const $state = document.getElementById("state");
+    const $grid  = document.getElementById("grid");
+
+    function showState(msg){ $state.textContent = msg; $state.hidden = false; $grid.hidden = true }
+    function showGrid(){ $state.hidden = true; $grid.hidden = false }
+
+    function el(tag, attrs={}, children=[]){
+      const n = document.createElement(tag);
+      Object.entries(attrs).forEach(([k,v])=>{
+        if (k === "class") n.className = v;
+        else if (k === "style") n.setAttribute("style", v);
+        else if (k in n) n[k] = v;
+        else n.setAttribute(k, v);
+      });
+      [].concat(children).forEach(c => n.appendChild(typeof c === "string" ? document.createTextNode(c) : c));
+      return n;
+    }
+
+    // ========= Render de tarjeta GRID estilo IG =========
+    function renderItem(item){
+      const hasHref = !!item.href;
+      const node = el("div", { class: "item" + (hasHref ? " link" : "") });
+
+      // imagen / placeholder
+      if (item.image){
+        node.appendChild(el("img", { class:"img", alt: item.title || "", src: item.image }));
+      } else {
+        node.appendChild(el("div", { class:"ph" }, "Sin imagen"));
+      }
+
+      // overlay con título al hover
+      if (item.title){
+        node.appendChild(el("div", { class:"overlay" }, item.title));
+      }
+
+      // click → abre href (si existe)
+      if (hasHref){
+        node.addEventListener("click", () => {
+          try {
+            const u = new URL(item.href);
+            window.open(u.href, "_blank", "noopener");
+          } catch {
+            // si no es URL válida, ignoramos el click
+          }
+        });
+      }
+
+      return node;
+    }
+
+    // ========= Carga de datos desde /api/grid =========
+    async function load(){
       try{
-        const clean = url.trim();
-        const hex32 = clean.match(/[a-f0-9]{32}/i);
-        if(hex32) return hex32[0].toLowerCase();
-        const dashed = clean.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i);
-        if(dashed) return dashed[0].replace(/-/g,'').toLowerCase();
-      }catch(_) {}
-      return '';
+        const r = await fetch(`/api/grid${forwardParams}`, { headers:{ Accept:"application/json" } });
+        if(!r.ok){
+          const txt = await r.text();
+          throw new Error(`Error /api/grid ${r.status}: ${txt}`);
+        }
+        const j = await r.json();
+
+        const items = Array.isArray(j.items) ? j.items : [];
+
+        if (!items.length){
+          showState("No hay elementos para mostrar.");
+          return;
+        }
+
+        // Limpia y dibuja
+        $grid.innerHTML = "";
+        items.forEach(it => $grid.appendChild(renderItem(it)));
+        showGrid();
+      }catch(e){
+        console.error(e);
+        showState("No se pudo cargar el grid.");
+      }
     }
 
-    function randomId(len=6){
-      const chars='abcdefghijklmnopqrstuvwxyz0123456789';
-      let out=''; for(let i=0;i<len;i++) out+=chars[Math.floor(Math.random()*chars.length)];
-      return out;
-    }
-
-    const genBtn = document.getElementById('generate-widget');
-    const errorBox = document.getElementById('error-box');
-    const resultBox = document.getElementById('widget-result');
-    const widgetUrlEl = document.getElementById('widget-url');
-    const copyBtn = document.getElementById('copy-url');
-    const openBtn = document.getElementById('open-url');
-
-    genBtn.addEventListener('click', async () => {
-      errorBox.style.display = 'none'; errorBox.textContent = '';
-      resultBox.style.display = 'none';
-
-      const token = document.getElementById('token-input').value.trim();
-      const dbUrl = document.getElementById('db-input').value.trim();
-      const confirmed = document.getElementById('integration-done').checked;
-
-      if(!token || !dbUrl){
-        errorBox.textContent = 'Completa Notion Integration Token y Database URL.'; errorBox.style.display = 'block'; return;
-      }
-      if(!confirmed){
-        errorBox.textContent = 'Confirma que conectaste la integración (checkbox).'; errorBox.style.display = 'block'; return;
-      }
-
-      genBtn.disabled = true; genBtn.textContent = 'Generando…';
-
-      const dbId = extractDbId(dbUrl) || 'db';
-      const base = window.location.origin;
-      const id = randomId();
-
-      const params = new URLSearchParams();
-      params.set('id', id);
-      params.set('db', dbId);
-      if(bioEnabled.checked){
-        const bioText = (document.getElementById('bio-text').value || 'Ver más').trim();
-        const bioUrl  = (document.getElementById('bio-url').value || '').trim();
-        if(bioUrl){ params.set('bio', bioUrl); params.set('bioText', bioText); }
-      }
-
-      const finalUrl = `${base}/widget/?${params.toString()}`;
-
-      widgetUrlEl.textContent = finalUrl;
-      openBtn.href = finalUrl;
-      resultBox.style.display = 'block';
-      resultBox.scrollIntoView({behavior:'smooth'});
-
-      genBtn.disabled = false; genBtn.textContent = 'Generar Widget →';
-    });
-
-    copyBtn.addEventListener('click', async () => {
-      const txt = widgetUrlEl.textContent;
-      try{ await navigator.clipboard.writeText(txt); copyBtn.textContent='Copiado'; setTimeout(()=>copyBtn.textContent='Copiar URL',1200); }
-      catch(_){ copyBtn.textContent='Copiar (falló)'; setTimeout(()=>copyBtn.textContent='Copiar URL',1200); }
-    });
+    load();
   </script>
 </body>
 </html>
-<script>
-  // Elimina cualquier botón que diga "Probar ahora"
-  document.addEventListener("DOMContentLoaded", () => {
-    [...document.querySelectorAll("button, a")].forEach(el => {
-      const t = (el.textContent || "").trim().toLowerCase();
-      if (t === "probar ahora" || t === "probar ahora →" || t.includes("probar ahora")) {
-        el.remove();
-      }
-    });
-  });
-</script>
