@@ -1,9 +1,12 @@
 {
-  "name": "flujo-creativo-notion-grid",
-  "private": true,
+  "name": "notion-grid-magic-link",
   "type": "module",
-  "engines": { "node": "20.x" },
+  "private": true,
+  "scripts": {
+    "start": "serve ./public -l 3000"
+  },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0"
+    "@supabase/supabase-js": "^2.45.4",
+    "serve": "^14.2.1"
   }
 }
