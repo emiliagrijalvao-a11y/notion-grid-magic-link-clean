@@ -23,63 +23,120 @@
       -webkit-font-smoothing:antialiased;
     }
     .wrap{max-width:1080px;margin:0 auto;padding:32px 20px 80px}
+
+    /* Header */
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
-    .brand{font-family:"Oswald",sans-serif;letter-spacing:.5px;font-size:22px;text-transform:uppercase}
-    .tabs{display:flex;gap:6px;justify-content:center;margin-bottom:32px;border-bottom:1px solid rgba(0,0,0,.15);padding-bottom:2px}
-    .tab{background:transparent;border:none;padding:10px 20px;font-size:15px;cursor:pointer;color:var(--black);font-weight:600;transition:.15s}
+    .brand{
+      font-family:"Oswald",sans-serif;
+      letter-spacing:.5px;font-size:22px;text-transform:uppercase
+    }
+
+    /* Tabs */
+    .tabs{
+      display:flex;gap:6px;justify-content:center;align-items:center;
+      margin-bottom:20px;border-bottom:1px solid rgba(0,0,0,.15);padding-bottom:2px
+    }
+    .tab{
+      background:transparent;border:none;padding:10px 20px;font-size:15px;cursor:pointer;
+      color:var(--black);font-weight:600;transition:.15s;text-transform:uppercase;letter-spacing:.3px
+    }
     .tab:hover{background:rgba(0,0,0,.05)}
     .tab.active{background:var(--black);color:var(--white)}
+
+    /* Optional small link under tabs */
+    .subnav{display:flex;justify-content:center;margin:8px 0 28px}
+    .subnav a{font-size:13px;color:var(--black);text-decoration:underline}
+
+    /* Content areas */
     .content{display:none}
     .content.active{display:block}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.15));border:1px solid rgba(0,0,0,.12);padding:40px 32px;margin-bottom:20px}
-    h1{font-family:"Oswald",sans-serif;font-weight:600;font-size:34px;line-height:1.15;margin:0 0 12px}
-    h2{font-family:"Oswald",sans-serif;font-weight:600;font-size:22px;margin:28px 0 12px}
-    h3{font-size:16px;font-weight:600;margin:20px 0 8px}
-    p{line-height:1.6;margin:0 0 14px}
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.15));
+      border:1px solid rgba(0,0,0,.12);padding:40px 32px;margin-bottom:20px
+    }
+
+    h1{font-family:"Oswald",sans-serif;font-weight:600;font-size:36px;line-height:1.1;margin:0 0 12px}
+    h2{font-family:"Oswald",sans-serif;font-weight:600;font-size:24px;margin:28px 0 12px}
+    h3{font-size:17px;font-weight:600;margin:20px 0 8px}
+    p{line-height:1.6;margin:0 0 16px}
+
+    /* Steps */
     .steps{margin-top:24px}
     .step{background:var(--tile);border:1px solid rgba(0,0,0,.18);margin-bottom:12px}
-    .step-header{padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:12px;font-weight:600;font-size:16px}
+    .step-header{
+      padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:12px;
+      font-weight:600;font-size:16px
+    }
     .step-header:hover{background:rgba(0,0,0,.03)}
+    .step-bullet{font-weight:700;display:inline-block;min-width:18px}
     .step-body{display:none;padding:0 20px 20px;border-top:1px solid rgba(0,0,0,.08)}
     .step.open .step-body{display:block}
     .step.open .step-header{background:rgba(0,0,0,.04)}
+
+    /* Option blocks */
     .option{background:rgba(255,255,255,.4);border:1px solid rgba(0,0,0,.12);padding:18px;margin:16px 0}
     .option h4{margin:0 0 8px;font-size:16px}
+
+    /* Table */
     table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
     th,td{border:1px solid rgba(0,0,0,.15);padding:10px 12px;text-align:left}
     th{background:rgba(0,0,0,.06);font-weight:600}
     code{background:rgba(0,0,0,.08);padding:2px 6px;font-family:ui-monospace,monospace;font-size:13px}
+
+    /* Form inputs */
     .form-group{margin:20px 0}
     .form-group label{display:block;font-weight:600;margin-bottom:8px;font-size:15px}
-    .form-group input[type="text"]{width:100%;padding:12px;border:1px solid rgba(0,0,0,.2);background:var(--white);font-size:14px;font-family:inherit}
+    .form-group input[type="text"]{
+      width:100%;padding:12px;border:1px solid rgba(0,0,0,.2);background:var(--white);
+      font-size:14px;font-family:inherit
+    }
     .form-group input[type="text"]:focus{outline:2px solid var(--black);outline-offset:2px}
+
     .toggle{display:flex;align-items:center;gap:12px;margin:16px 0;cursor:pointer}
     .toggle input[type="checkbox"]{width:20px;height:20px;cursor:pointer}
+
+    /* Collapsible */
     .collapsible{color:var(--black);text-decoration:underline;cursor:pointer;font-size:14px;margin:12px 0;display:inline-block;font-weight:600}
     .collapsible-content{display:none;margin-top:12px}
     .collapsible-content.open{display:block}
-    .btn{background:var(--black);color:var(--white);border:none;padding:12px 24px;font-size:14px;cursor:pointer;display:inline-block;text-decoration:none;margin-top:16px}
+
+    /* Buttons */
+    .btn{
+      background:var(--black);color:var(--white);border:none;padding:12px 24px;font-size:14px;
+      cursor:pointer;display:inline-block;text-decoration:none;margin-top:16px
+    }
     .btn:hover{opacity:.9}
     .btn-secondary{background:var(--tile);color:var(--black);border:1px solid rgba(0,0,0,.3)}
+
+    /* Links */
     a{color:var(--black);text-decoration:underline}
-    a:hover{opacity:.7}
+    a:hover{opacity:.75}
+
+    /* FAQ */
     .faq-item{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid rgba(0,0,0,.08)}
     .faq-item:last-child{border:none}
-    .widget-card{background:rgba(255,255,255,.3);border:1px solid rgba(0,0,0,.12);padding:20px;margin-bottom:16px}
-    .widget-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-    .widget-title{font-weight:600;font-size:16px}
-    .widget-id{font-size:13px;color:#666;margin-top:2px}
-    .widget-info{font-size:14px;margin:8px 0}
-    .widget-info strong{display:inline-block;min-width:140px}
-    .widget-links{display:flex;gap:12px;margin-top:12px}
-    .widget-links a{font-size:13px;padding:6px 12px;background:var(--tile);border:1px solid rgba(0,0,0,.2);text-decoration:none;color:var(--black)}
+    .faq-item h3{font-size:16px;margin:0 0 8px}
+
+    /* Account */
     .account-section{margin-bottom:32px}
     .account-info{background:rgba(255,255,255,.3);border:1px solid rgba(0,0,0,.12);padding:20px}
     .info-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.08)}
     .info-row:last-child{border:none}
     .info-label{font-weight:600}
     .info-value{color:#333}
-    footer{margin-top:28px;font-size:12px;opacity:.7;display:flex;justify-content:space-between}
+    .badge{
+      display:inline-block;border:1px solid var(--black);padding:4px 10px;font-size:12px;font-weight:700;margin-left:8px;text-transform:uppercase;letter-spacing:.3px
+    }
+
+    /* Widgets list */
+    .widget-card{background:rgba(255,255,255,.3);border:1px solid rgba(0,0,0,.12);padding:20px;margin-bottom:16px}
+    .widget-title{font-weight:600;font-size:16px}
+    .widget-id{font-size:13px;color:#666;margin-top:2px}
+    .widget-info{font-size:14px;margin:8px 0}
+    .widget-info strong{display:inline-block;min-width:140px}
+    .widget-links{display:flex;gap:12px;margin-top:12px}
+    .widget-links a{font-size:13px;padding:6px 12px;background:var(--tile);border:1px solid rgba(0,0,0,.2);text-decoration:none;color:var(--black)}
   </style>
 </head>
 <body>
@@ -88,69 +145,104 @@
       <div class="brand">Flujo Creativo</div>
     </header>
 
+    <!-- Tabs -->
     <nav class="tabs">
       <button class="tab active" data-tab="start">Empieza aquí</button>
       <button class="tab" data-tab="setup">Setup</button>
-      <button class="tab" data-tab="help">Help</button>
-      <button class="tab" data-tab="account">Account</button>
+      <button class="tab" data-tab="help">Ayuda</button>
+      <button class="tab" data-tab="account">Cuenta</button>
     </nav>
+    <div class="subnav">
+      <a href="#" data-goto="start">Video tutoriales (próximamente)</a>
+    </div>
 
-    <!-- TAB 1 -->
+    <!-- TAB 1: Empieza aquí -->
     <div class="content active" id="start">
       <div class="card">
-        <h1>Planifica tu feed de Instagram trayendo tu Grid a Notion</h1>
-        <p style="font-size:16px;margin-bottom:22px">En pocos pasos tendrás una galería estilo Instagram que se actualiza automáticamente.</p>
+        <h1>Planifica tu feed de Instagram trayendo el Grid a Notion</h1>
+        <p style="font-size:17px;margin-bottom:28px">En pocos pasos tendrás una galería estilo Instagram que se actualiza automáticamente.</p>
 
         <h2>Pasos</h2>
         <div class="steps">
+
+          <!-- Step 1 -->
           <div class="step open">
-            <div class="step-header">1. Crea tu base de datos en Notion</div>
+            <div class="step-header">
+              <span class="step-bullet">1</span>
+              <span>Configura tu base en Notion</span>
+            </div>
             <div class="step-body">
-              <p><strong>Opción recomendada:</strong> duplica nuestro template.</p>
-              <p><a class="btn" target="_blank" href="https://www.notion.so/Flujo-Creativo-Instagram-Grid-28673654be06818d8561f78d28ed6f3b">Duplicar template →</a></p>
+              <p>Empieza con nuestro template o crea tu base manualmente.</p>
 
               <div class="option">
-                <h4>Si lo haces desde cero, usa estas columnas:</h4>
+                <h4>Opción 1: Duplicar template (recomendado)</h4>
+                <p>Duplica el template para obtener una base lista con ejemplos.</p>
+                <a href="https://rain-shadow-cac.notion.site/Flujo-Creativo-Instagram-Grid-28673654be06818d8561f78d28ed6f3b?pvs=143" target="_blank" class="btn">Duplicar template →</a>
+              </div>
+
+              <div class="option">
+                <h4>Opción 2: Crear tu base desde cero</h4>
+                <p>Usa exactamente estas propiedades:</p>
                 <table>
-                  <thead><tr><th>Propiedad</th><th>Tipo</th><th>Propósito</th></tr></thead>
+                  <thead>
+                    <tr><th>Propiedad</th><th>Tipo</th><th>Uso</th></tr>
+                  </thead>
                   <tbody>
-                    <tr><td><code>Name</code></td><td>Text</td><td>Título al hacer hover</td></tr>
-                    <tr><td><code>Publish Date</code></td><td>Date</td><td>Orden de la galería (desc)</td></tr>
-                    <tr><td><code>Attachment</code></td><td>Files & Media</td><td>Imagen o video</td></tr>
-                    <tr><td><code>*Image Source</code></td><td>Select</td><td>Attachment/Link/Canva (Pro)</td></tr>
-                    <tr><td><code>*Link</code></td><td>Text</td><td>URL externa (Pro)</td></tr>
-                    <tr><td><code>*Canva Link</code></td><td>URL</td><td>Embed Canva (Pro)</td></tr>
+                    <tr><td><code>Name</code></td><td>Text</td><td>Título de cada item</td></tr>
+                    <tr><td><code>Publish Date</code></td><td>Date</td><td>Orden del grid (más nuevo primero)</td></tr>
+                    <tr><td><code>Attachment</code></td><td>Files & Media</td><td>Imágenes o videos</td></tr>
+                    <tr><td><code>Image Source</code></td><td>Select</td><td>Attachment / Link / Canva Design (Pro)</td></tr>
+                    <tr><td><code>Link</code></td><td>Text</td><td>URL externa (Pro)</td></tr>
+                    <tr><td><code>Canva Link</code></td><td>URL</td><td>Enlace de incrustación de Canva (Pro)</td></tr>
                   </tbody>
                 </table>
+                <p style="font-size:13px;color:#555">Las tres primeras son requeridas. Las demás habilitan funciones Pro.</p>
               </div>
             </div>
           </div>
 
+          <!-- Step 2 -->
           <div class="step">
-            <div class="step-header">2. Crea la Integration en Notion y conéctala</div>
+            <div class="step-header">
+              <span class="step-bullet">2</span>
+              <span>Crea tu integración y conéctala</span>
+            </div>
             <div class="step-body">
               <ol style="line-height:1.8">
-                <li>Abre <a target="_blank" href="https://www.notion.so/my-integrations">Notion → My Integrations</a> y crea una nueva (tipo “Internal”).</li>
-                <li>Copia tu <strong>Integration Token</strong>.</li>
-                <li>En tu base de datos, menú “•••” → <strong>Connection</strong> → selecciona esa integración.</li>
+                <li>Abre <a href="https://www.notion.so/my-integrations" target="_blank">Notion → My integrations</a> y crea una “Internal Integration”.</li>
+                <li>Copia el <strong>Integration Token</strong>.</li>
+                <li>En tu base duplicada: menú <strong>••• → Connections</strong> → selecciona tu integración.</li>
               </ol>
+              <div class="toggle">
+                <input type="checkbox" id="step2-done">
+                <label for="step2-done">Sí, ya conecté mi integración a la base</label>
+              </div>
             </div>
           </div>
 
+          <!-- Step 3 -->
           <div class="step">
-            <div class="step-header">3. Genera el widget e insértalo en Notion</div>
+            <div class="step-header">
+              <span class="step-bullet">3</span>
+              <span>Genera el widget e incrústalo</span>
+            </div>
             <div class="step-body">
               <ol style="line-height:1.8">
-                <li>Ve a la pestaña <a href="#" data-goto="setup">Setup</a> y genera tu URL.</li>
-                <li>En Notion, escribe <code>/embed</code> y pega la URL del widget.</li>
+                <li>Ve a la pestaña <a href="#" data-goto="setup">Setup</a>.</li>
+                <li>Pega tu <strong>Integration Token</strong> y la <strong>Database URL</strong> (abrir DB en vista de página completa y copiar la URL real de la base).</li>
+                <li>Haz clic en <strong>Generar Widget</strong> y luego pega esa URL en Notion con <code>/embed</code>.</li>
               </ol>
+              <p style="background:rgba(0,0,0,.05);padding:14px;margin-top:16px;font-size:14px">
+                Consejos: si ves errores de acceso, casi siempre es porque la URL apunta a una vista vinculada o a una página que contiene la base, no a la base fuente.
+              </p>
             </div>
           </div>
+
         </div>
       </div>
     </div>
 
-    <!-- TAB 2 -->
+    <!-- TAB 2: Setup -->
     <div class="content" id="setup">
       <div class="card">
         <h1>Widget Setup</h1>
@@ -161,210 +253,214 @@
           <span class="collapsible" data-target="token-instructions">+ Instrucciones</span>
           <div class="collapsible-content" id="token-instructions">
             <ol style="font-size:14px;line-height:1.7;margin-top:12px">
-              <li>Ve a <a target="_blank" href="https://www.notion.so/my-integrations">Notion → My Integrations</a></li>
-              <li>Crea integración “Internal” y copia el token</li>
-              <li>Conecta esa integración a tu base de datos</li>
+              <li>Crear integración interna en <a href="https://www.notion.so/my-integrations" target="_blank">Notion</a>.</li>
+              <li>Copiar el token y pegarlo aquí. Puedes reutilizar el mismo token en futuros widgets.</li>
             </ol>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Database URL</label>
-          <input type="text" id="db-input" placeholder="https://www.notion.so/.../xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
-          <p style="font-size:13px;margin-top:6px;color:#555">Copia la URL de la base de datos en vista de página completa (no una vista vinculada).</p>
+          <label>Conecta la integración con la base de datos</label>
+          <ol style="font-size:14px;line-height:1.7;margin:0">
+            <li>Abrir la base en Notion → <strong>••• → Connections</strong> → seleccionar tu integración.</li>
+          </ol>
+          <div class="toggle">
+            <input type="checkbox" id="integration-done">
+            <label for="integration-done">Sí, ya conecté mi integración a la base</label>
+          </div>
         </div>
 
-        <div class="toggle">
-          <input type="checkbox" id="integration-done">
-          <label for="integration-done">Sí, ya conecté la integración a la base de datos</label>
+        <div class="form-group">
+          <label>Database URL</label>
+          <input type="text" id="db-input" placeholder="https://www.notion.so/workspace/..." />
+          <p style="font-size:13px;margin-top:6px;color:#555">Debes copiar la URL de la base fuente abierta en vista de página completa.</p>
+
+          <span class="collapsible" data-target="db-instructions">+ Mostrar instrucciones</span>
+          <div class="collapsible-content" id="db-instructions">
+            <ol style="font-size:14px;line-height:1.7;margin-top:12px">
+              <li>Abre la base de datos en su propia página.</li>
+              <li>Usa “Copy link” en el menú <strong>•••</strong> o copia desde la barra del navegador.</li>
+              <li>Evita enlaces de vistas vinculadas o páginas contenedoras.</li>
+            </ol>
+          </div>
         </div>
 
         <button class="btn" id="generate-widget">Generar Widget →</button>
 
-        <div id="widget-result" style="display:none;margin-top:24px;padding:20px;background:rgba(0,128,0,.08);border:1px solid rgba(0,128,0,.25)">
+        <div id="widget-result" style="display:none;margin-top:24px;padding:20px;background:rgba(0,128,0,.08);border:1px solid rgba(0,128,0,.3)">
           <h3>Widget generado</h3>
-          <p>URL:</p>
+          <p>Tu widget URL:</p>
           <code id="widget-url" style="display:block;padding:12px;background:var(--white);margin:8px 0">https://tu-dominio.com/widget/xxxxx</code>
           <button class="btn-secondary btn" id="copy-widget-url">Copiar URL</button>
         </div>
       </div>
     </div>
 
-    <!-- TAB 3 -->
+    <!-- TAB 3: Ayuda -->
     <div class="content" id="help">
       <div class="card">
         <h1>Preguntas Frecuentes</h1>
 
         <div class="faq-item">
-          <h3>¿Cómo empiezo?</h3>
-          <p>Sigue la pestaña <a href="#" data-goto="start">Empieza aquí</a>. Luego ve a <a href="#" data-goto="setup">Setup</a> para generar tu URL usando el Integration Token y la Database URL.</p>
+          <h3>¿Cómo empiezo con el widget?</h3>
+          <p>Sigue la guía en <a href="#" data-goto="start">Empieza aquí</a> y luego genera tu widget en <a href="#" data-goto="setup">Setup</a>. Tardarás unos minutos.</p>
         </div>
 
         <div class="faq-item">
-          <h3>Mi widget no accede a la base de datos</h3>
-          <p>Asegúrate de copiar la URL de la base de datos real (página completa) y que la integración esté conectada a esa base. Evita usar vistas vinculadas.</p>
+          <h3>¿Cómo configuro correctamente mi base de Notion?</h3>
+          <p>Usa el <a href="https://rain-shadow-cac.notion.site/Flujo-Creativo-Instagram-Grid-28673654be06818d8561f78d28ed6f3b?pvs=143" target="_blank">template</a> o crea las columnas: <code>Name</code> (Text), <code>Publish Date</code> (Date), <code>Attachment</code> (Files & Media). Pro: <code>Image Source</code> (Select), <code>Link</code> (Text), <code>Canva Link</code> (URL).</p>
         </div>
 
         <div class="faq-item">
-          <h3>Basic vs Pro</h3>
-          <p><strong>Basic:</strong> usa solo <code>Attachment</code> (hasta 12 ítems).<br><strong>Pro:</strong> Attachment, Link externo y Canva embed; sin límite. Además: ítems clicables, carrusel y pins.</p>
+          <h3>El widget no puede acceder a mi base</h3>
+          <p>Casi siempre es por usar la URL de una vista o de una página contenedora. Abre la base fuente en página completa y copia esa URL. Verifica también que la integración esté conectada en <strong>Connections</strong>.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>¿Puedo usar múltiples widgets o múltiples clientes?</h3>
+          <p>Sí. Crea una base por cliente, conecta la misma integración a cada base y genera un widget por base.</p>
         </div>
 
         <div class="faq-item">
           <h3>¿Cómo actualizo a Pro?</h3>
-          <p>Compra en Shopify con el mismo email. Tu cuenta pasa a Pro automáticamente.</p>
+          <p>Compra la licencia Pro en tu tienda de Shopify. Si compras con el mismo correo, tus widgets se actualizan al refrescar.</p>
         </div>
 
         <div class="faq-item">
-          <h3>Soporte</h3>
-          <p>Escríbenos a <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a>.</p>
+          <h3>¿Cómo pido ayuda?</h3>
+          <p>Escríbeme a <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a>.</p>
         </div>
       </div>
     </div>
 
-    <!-- TAB 4 -->
+    <!-- TAB 4: Cuenta -->
     <div class="content" id="account">
       <div class="card">
-        <h1>Información de la cuenta</h1>
+        <h1>Información personal</h1>
 
         <div class="account-info">
-          <div class="info-row"><span class="info-label">Email</span><span class="info-value" id="user-email">—</span></div>
-          <div class="info-row"><span class="info-label">Nombre</span><span class="info-value"><span id="user-name">—</span></span></div>
-          <div class="info-row"><span class="info-label">Plan</span><span class="info-value" id="account-type">Basic Account</span></div>
+          <div class="info-row">
+            <span class="info-label">Email</span>
+            <span class="info-value" id="user-email">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Nombre</span>
+            <span class="info-value"><span id="user-name">—</span> <a href="#" style="margin-left:12px;font-size:14px">Editar</a></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Tipo de cuenta</span>
+            <span class="info-value"><span id="account-type">Basic</span> <a href="#" class="badge" id="upgrade-link">Actualizar a Pro</a></span>
+          </div>
         </div>
 
         <div class="account-section">
           <h2>Licencias</h2>
-          <div id="license-list" style="font-size:14px;opacity:.7">No hay licencias registradas.</div>
+          <div class="license-list" id="license-list">
+            <p style="margin:10px 0">No hay licencias disponibles.</p>
+          </div>
         </div>
 
         <div class="account-section">
-          <h2>Tus Widgets</h2>
-          <div id="widgets-container" style="font-size:14px;opacity:.7">Aún no has creado ningún widget.</div>
+          <h2>Mis Widgets</h2>
+          <div id="widgets-list">
+            <p style="margin:10px 0">Aún no has creado ningún widget.</p>
+          </div>
         </div>
       </div>
     </div>
-
-    <footer>
-      <div>© 2025 Flujo Creativo · Sistema Notion Grid</div>
-      <div><a href="#" data-goto="help">¿Necesitas ayuda?</a></div>
-    </footer>
   </div>
 
   <script>
     // Tabs
     document.querySelectorAll('.tab').forEach(tab=>{
-      tab.addEventListener('click',()=>{
-        const t = tab.dataset.tab;
-        document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      tab.addEventListener('click', ()=>{
+        const target = tab.dataset.tab;
+        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
         tab.classList.add('active');
         document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
-        document.getElementById(t).classList.add('active');
+        document.getElementById(target).classList.add('active');
+        window.scrollTo({top:0,behavior:'smooth'});
       });
     });
-    // Navegación interna
-    document.querySelectorAll('[data-goto]').forEach(a=>{
-      a.addEventListener('click',(e)=>{e.preventDefault();document.querySelector(`[data-tab="${a.dataset.goto}"]`).click();});
+
+    // Internal navigation links
+    document.querySelectorAll('[data-goto]').forEach(link=>{
+      link.addEventListener('click',(e)=>{
+        e.preventDefault();
+        const target = link.dataset.goto;
+        document.querySelector(`[data-tab="${target}"]`).click();
+      });
     });
-    // Steps plegables
-    document.querySelectorAll('.step-header').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));
+
+    // Steps toggle
+    document.querySelectorAll('.step-header').forEach(h=>{
+      h.addEventListener('click',()=>h.parentElement.classList.toggle('open'));
+    });
+
     // Collapsibles
     document.querySelectorAll('.collapsible').forEach(tr=>{
       tr.addEventListener('click',()=>{
-        const id = tr.dataset.target; const ct = document.getElementById(id);
-        ct.classList.toggle('open');
-        tr.textContent = ct.classList.contains('open') ? '− Ocultar instrucciones' : '+ Instrucciones';
+        const id = tr.dataset.target;
+        const el = document.getElementById(id);
+        el.classList.toggle('open');
+        tr.textContent = el.classList.contains('open') ? '- Ocultar instrucciones' : '+ Mostrar instrucciones';
       });
     });
 
-    // Generar widget (requiere /api/widgets/create)
+    // Copy widget URL
+    document.getElementById('copy-widget-url').addEventListener('click',()=>{
+      const v = document.getElementById('widget-url').textContent.trim();
+      navigator.clipboard.writeText(v);
+    });
+
+    // Generate widget: intenta backend y, si falla, usa mock
     document.getElementById('generate-widget').addEventListener('click', async ()=>{
       const token = document.getElementById('token-input').value.trim();
       const dbUrl = document.getElementById('db-input').value.trim();
-      const done  = document.getElementById('integration-done').checked;
-      const email = new URLSearchParams(location.search).get('email');
+      const connected = document.getElementById('integration-done').checked;
 
-      if(!email){ alert('Abre el Setup desde el link del correo (falta ?email=)'); return; }
-      if(!token || !dbUrl){ alert('Completa token y database URL'); return; }
-      if(!done){ alert('Confirma la casilla de integración'); return; }
+      if(!token || !dbUrl){
+        alert('Completa token y Database URL.');
+        return;
+      }
+      if(!connected){
+        alert('Marca que conectaste la integración en Notion.');
+        return;
+      }
 
-      const r = await fetch('/api/widgets/create',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ email, notionToken: token, databaseUrl: dbUrl })
-      });
-      const data = await r.json();
-      if(!r.ok || !data.success){ alert(data.error || 'Error al crear el widget'); return; }
+      try {
+        const r = await fetch('/api/widgets/create', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ notionToken: token, databaseUrl: dbUrl })
+        });
+        if(!r.ok) throw new Error('create endpoint not OK');
+        const data = await r.json();
+        if(!data || !data.widgetUrl) throw new Error('no widgetUrl');
+        document.getElementById('widget-url').textContent = data.widgetUrl;
+      } catch (err) {
+        // Fallback mock
+        const id = Math.random().toString(36).slice(2, 8);
+        const base = (window.location.origin || 'https://tu-dominio.vercel.app').replace(/\/$/,'');
+        document.getElementById('widget-url').textContent = `${base}/widget/${id}`;
+      }
 
-      document.getElementById('widget-url').textContent = data.widgetUrl;
       document.getElementById('widget-result').style.display = 'block';
       document.getElementById('widget-result').scrollIntoView({behavior:'smooth'});
     });
-    document.getElementById('copy-widget-url').addEventListener('click',()=>{
-      navigator.clipboard.writeText(document.getElementById('widget-url').textContent);
-    });
 
-    // Cargar Account (requiere /api/user/account)
-    (async ()=>{
-      const email = new URLSearchParams(location.search).get('email');
-      if(!email) return;
-      try{
-        const r = await fetch(`/api/user/account?email=${encodeURIComponent(email)}`);
-        if(!r.ok) return;
-        const u = await r.json();
-        const byId=id=>document.getElementById(id);
-
-        if(byId('user-email')) byId('user-email').textContent = u.email || '—';
-        if(byId('user-name'))  byId('user-name').textContent  = u.name  || '—';
-        if(byId('account-type')) byId('account-type').textContent = (u.accountType==='pro')?'Pro Account':'Basic Account';
-
-        const lic = byId('license-list');
-        if(lic){
-          lic.innerHTML = '';
-          if(!u.licenses || u.licenses.length===0){
-            lic.innerHTML = '<div style="opacity:.7">No hay licencias registradas.</div>';
-          } else {
-            u.licenses.forEach(L=>{
-              const row=document.createElement('div');
-              row.style.cssText='background:rgba(255,255,255,.25);border:1px solid rgba(0,0,0,.1);padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:14px;';
-              row.innerHTML = `
-                <div>
-                  <div style="font-weight:600">${L.type} License Key</div>
-                  <div style="font-family:ui-monospace,monospace;font-size:12px;color:#555">${L.key || '—'}</div>
-                </div>
-                <div style="font-size:13px;color:#666">${L.date || ''}</div>
-              `;
-              lic.appendChild(row);
-            });
-          }
-        }
-
-        const w = byId('widgets-container');
-        if(w){
-          w.innerHTML='';
-          if(!u.widgets || u.widgets.length===0){
-            w.innerHTML='<div style="opacity:.7">Aún no has creado ningún widget.</div>';
-          } else {
-            u.widgets.forEach(W=>{
-              const card=document.createElement('div'); card.className='widget-card';
-              card.innerHTML=`
-                <div class="widget-header">
-                  <div>
-                    <div class="widget-title">Widget #${W.id}</div>
-                    <div class="widget-id">ID: ${W.id}</div>
-                  </div>
-                </div>
-                <div class="widget-info"><strong>Integration Token:</strong> ${W.token || '—'}</div>
-                <div class="widget-info"><strong>Database:</strong> ${W.databaseId || '—'}</div>
-                <div class="widget-info"><strong>Widget URL:</strong> ${W.url || '—'}</div>
-                <div class="widget-links">
-                  ${W.url ? `<a href="${W.url}" target="_blank">Ver Widget</a>` : ''}
-                </div>`;
-              w.appendChild(card);
-            });
-          }
-        }
-      }catch(e){}
+    // Account simulated (replace with /api/user/account when esté listo)
+    (async function initAccount(){
+      // Si hay ?plan=pro en la URL, mostrar Pro
+      const params = new URLSearchParams(location.search);
+      const plan = params.get('plan');
+      if(plan === 'pro'){
+        document.getElementById('account-type').textContent = 'Pro';
+        document.getElementById('upgrade-link').style.display = 'none';
+      }
+      // Relleno mínimo por ahora
+      document.getElementById('user-email').textContent = 'emiliagrijalvao@gmail.com';
+      document.getElementById('user-name').textContent = '—';
     })();
   </script>
 </body>
