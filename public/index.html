@@ -178,3 +178,14 @@
   </script>
 </body>
 </html>
+<script>
+  // Elimina cualquier botón que diga "Probar ahora"
+  document.addEventListener("DOMContentLoaded", () => {
+    [...document.querySelectorAll("button, a")].forEach(el => {
+      const t = (el.textContent || "").trim().toLowerCase();
+      if (t === "probar ahora" || t === "probar ahora →" || t.includes("probar ahora")) {
+        el.remove();
+      }
+    });
+  });
+</script>
