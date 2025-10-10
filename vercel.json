@@ -1,17 +1,17 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false,
+  "version": 2,
+  "routes": [
+    { "src": "^/api/(.*)$", "dest": "/api/$1" },
+
+    { "src": "^/widget(?:/.*)?$", "dest": "/public/widget/index.html" },
+    { "src": "^/setup(?:/.*)?$",  "dest": "/public/setup/index.html" },
+
+    { "src": "^/(.*)$", "dest": "/public/$1" }
+  ],
   "headers": [
     {
       "source": "/(.*)\\.html",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store" }
-      ]
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
     }
-  ],
-  "rewrites": [
-    { "source": "/widget/:id", "destination": "/widget/index.html?id=:id" },
-    { "source": "/setup", "destination": "/setup/index.html" },
-    { "source": "/widget", "destination": "/widget/index.html" }
   ]
 }
