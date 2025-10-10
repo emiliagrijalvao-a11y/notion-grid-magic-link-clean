@@ -1,15 +1,13 @@
 // /api/_supabase.js
 import { createClient } from "@supabase/supabase-js";
 
-const url = process.env.SUPABASE_URL;
-const serviceRole = process.env.SUPABASE_SERVICE_ROLE;
-const schema = process.env.SUPABASE_SCHEMA || "public";
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE;
 
-if (!url || !serviceRole) {
-  throw new Error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE");
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
+  throw new Error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE en Vercel → Settings → Environment Variables");
 }
 
-export const supabase = createClient(url, serviceRole, {
-  db: { schema },
-  auth: { persistSession: false },
+export const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE, {
+  auth: { persistSession: false }
 });
