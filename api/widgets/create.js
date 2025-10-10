@@ -1,48 +1,19 @@
-// /api/widgets/create.js
-import { supabase } from "./_supabase.js";
-
-function shortId() {
-  return Math.random().toString(36).slice(2, 8);
-}
-function maskToken(tok = "") {
-  if (!tok) return "—";
-  if (tok.length < 8) return "••••";
-  return `${tok.slice(0,4)}••••${tok.slice(-4)}`;
-}
-function extractDbIdFromUrl(url = "") {
-  const m = url.match(/[0-9a-f]{32}/i);
-  return m ? m[0] : null;
-}
-
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ success: false, error: "Method Not Allowed" });
-
   try {
-    const { email, notionToken, databaseUrl } = req.body || {};
-    if (!email || !notionToken || !databaseUrl) {
-      return res.status(400).json({ success: false, error: "Faltan campos (email, notionToken, databaseUrl)" });
-    }
+    if (req.method !== "POST") return res.status(405).json({ ok:false, error:"Method not allowed" });
 
-    const BASE_URL = process.env.BASE_URL;
-    if (!BASE_URL) return res.status(500).json({ success: false, error: "Falta BASE_URL" });
+    const { notionToken, databaseUrl } = req.body || {};
+    if (!notionToken || !databaseUrl)
+      return res.status(400).json({ ok:false, error:"notionToken y databaseUrl son requeridos" });
 
-    const sid = shortId();
-    const widgetUrl = `${BASE_URL}/widget/${sid}`;
-    const dbId = extractDbIdFromUrl(databaseUrl) || databaseUrl;
+    // TODO: aquí guardaríamos en Supabase el widget con su fuente (pendiente)
+    // Por ahora, generamos un ID aleatorio y devolvemos la URL para embeber:
+    const id = Math.random().toString(36).slice(2, 8);
+    const base = process.env.BASE_URL || `https://${req.headers.host}`;
+    const widgetUrl = `${base.replace(/\/$/,"")}/widget/${id}`;
 
-    await supabase.from("fc_users").upsert({ email: email.toLowerCase() }, { onConflict: "email" });
-
-    const { error } = await supabase.from("fc_widgets").insert({
-      short_id: sid,
-      user_email: email.toLowerCase(),
-      database_id: dbId,
-      widget_url: widgetUrl,
-      token_mask: maskToken(notionToken)
-    });
-    if (error) throw error;
-
-    return res.json({ success: true, widgetUrl, shortId: sid });
+    return res.json({ ok:true, widgetId:id, widgetUrl });
   } catch (err) {
-    return res.status(500).json({ success: false, error: String(err) });
+    return res.status(500).json({ ok:false, error:String(err) });
   }
 }
