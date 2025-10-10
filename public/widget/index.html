@@ -172,3 +172,12 @@
   </script>
 </body>
 </html>
+<div style="margin-top:24px;border-top:1px solid rgba(0,0,0,.12);padding-top:16px">
+  <h2 style="font-family:Oswald,sans-serif">Bio Widget</h2>
+  <p style="font-size:14px">Tu enlace para embeber el Bio:</p>
+  <code id="bio-url" style="display:block;padding:10px;background:#fff;border:1px solid rgba(0,0,0,.2)">
+    https://TU-DOMINIO/bio/mi-bio
+  </code>
+  <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('bio-url').textContent)">Copiar URL del Bio</button>
+</div>
+
