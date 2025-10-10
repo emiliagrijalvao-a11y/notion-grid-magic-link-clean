@@ -1,47 +1,69 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Widget · Flujo Creativo</title>
   <style>
-    html,body{ height:100%; margin:0; background:#D9D9D9 }
-    #frame{ border:0; width:100%; height:100vh; display:none }
-    #err{ font-family:system-ui,-apple-system,Inter,sans-serif; max-width:720px; margin:80px auto; padding:20px; background:#fff; border:1px solid rgba(0,0,0,.15)}
-    code{ background:#f3f3f3; padding:2px 6px }
+    html,body{height:100%;margin:0}
+    body{background:#fff;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif}
+    .wrap{height:100%;display:flex;flex-direction:column}
+    header{padding:8px 12px;font-size:12px;color:#222;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+    header .brand{font-weight:700;letter-spacing:.4px}
+    .view{flex:1;min-height:0}
+    iframe{width:100%;height:100%;border:0;display:block}
+    .err{padding:24px;color:#b00}
+    a{color:#000}
   </style>
 </head>
 <body>
-  <iframe id="frame" title="Flujo Creativo · Grid"></iframe>
-  <div id="err" style="display:none"></div>
+  <div class="wrap">
+    <header>
+      <div class="brand">Flujo Creativo · Widget</div>
+      <a href="/" target="_blank" rel="noopener">¿Qué es esto?</a>
+    </header>
+    <div class="view" id="view">
+      <div class="err" id="err" style="display:none"></div>
+    </div>
+  </div>
 
   <script>
-    const params = new URLSearchParams(location.search);
-    const wid = params.get('wid');
-    const iframe = document.getElementById('frame');
-    const err = document.getElementById('err');
+    // Host del mini original (no tocar el diseño del widget mini)
+    const MINI_HOST = 'https://notion-grid-mini.vercel.app/preview';
 
-    async function main(){
-      if(!wid){ showErr('Falta el parámetro <code>wid</code> en la URL.'); return; }
-      const r = await fetch('/api/widgets/resolve?wid=' + encodeURIComponent(wid));
-      const j = await r.json().catch(()=>null);
-      if(!r.ok || !j || !j.ok){ showErr((j && j.error) || 'No se encontró el widget.'); return; }
+    function q(name){ return new URLSearchParams(location.search).get(name) }
 
-      // Construye la URL del widget MINI original (tu despliegue):
-      // Si usas otro host para el mini, cambia esta constante.
-      const MINI_HOST = 'https://notion-grid-mini.vercel.app/preview';
+    async function boot(){
+      const wid = q('wid');
+      const view = document.getElementById('view');
+      const err  = document.getElementById('err');
 
-      const src = `${MINI_HOST}?db=${encodeURIComponent(j.grid_db_id)}&bio=${encodeURIComponent(j.bio_db_id)}&wid=${encodeURIComponent(wid)}`;
-      iframe.src = src;
-      iframe.style.display = 'block';
+      if (!wid) {
+        err.style.display='block';
+        err.textContent='Falta el parámetro ?wid=';
+        return;
+      }
+
+      try {
+        const r = await fetch(`/api/widgets/resolve?wid=${encodeURIComponent(wid)}`);
+        const j = await r.json();
+        if (!r.ok || !j.ok) throw new Error(j.error || 'No encontrado');
+
+        const params = new URLSearchParams();
+        params.set('db',  j.gridDbId);
+        if (j.bioDbId) params.set('bio', j.bioDbId);
+
+        const src = `${MINI_HOST}?${params.toString()}`;
+        const ifr = document.createElement('iframe');
+        ifr.src = src;
+        view.innerHTML='';
+        view.appendChild(ifr);
+      } catch (e) {
+        err.style.display='block';
+        err.textContent = 'No pudimos cargar el widget: ' + (e.message || e);
+      }
     }
-
-    function showErr(message){
-      err.innerHTML = `<h2>404: NOT_FOUND</h2><p>${message}</p><p>Verifica que este embed sea <code>/widget?wid=XXXXX</code> y que el <em>wid</em> exista.</p>`;
-      err.style.display = 'block';
-    }
-
-    main();
+    boot();
   </script>
 </body>
 </html>
