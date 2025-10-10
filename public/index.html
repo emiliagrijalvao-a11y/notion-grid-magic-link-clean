@@ -3,164 +3,94 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Widget · Grid</title>
-  <meta name="color-scheme" content="light dark">
+  <title>Flujo Creativo · Tu enlace de Setup</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet" />
   <style>
-    :root{
-      --bg: transparent;          /* fondo transparente para Notion */
-      --tile: #f3f3f3;
-      --border: #e5e5e5;
-      --text: #111;
-      --overlayText: #fff;
-      --gap: 8px;
-      --radius: 0;                /* look cuadrado tipo IG */
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    :root{ --beige:#D9D9D9; --tile:#ECEBE8; --black:#000; --white:#fff; }
+    *{ box-sizing:border-box }
     body{
-      margin:0;background:var(--bg);color:var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+      margin:0; background:var(--beige); color:var(--black);
+      font-family:"Inter",system-ui,-apple-system,sans-serif; -webkit-font-smoothing:antialiased;
     }
-
-    .wrap{padding:0;margin:0}
-
-    /* GRID estilo Instagram */
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);   /* 3 columnas fijas para “look IG” */
-      gap: var(--gap);
-      width:100%;
+    .wrap{ max-width:860px; margin:0 auto; padding:48px 20px 64px }
+    h1{
+      font-family:"Oswald",sans-serif; font-weight:600; font-size:34px; margin:0 0 10px; text-align:center;
     }
-    @media (max-width: 760px){
-      .grid{ grid-template-columns: repeat(2, 1fr); }
+    p.lead{ text-align:center; margin:0 0 24px; font-size:16px; }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.15));
+      border:1px solid rgba(0,0,0,.12); padding:30px; margin-top:16px;
     }
-
-    .item{
-      position:relative; border:1px solid var(--border); background:var(--tile);
-      overflow:hidden; border-radius:var(--radius);
-      aspect-ratio:1/1; /* cuadrado perfecto */
+    .field{
+      background:var(--tile); border:1px solid rgba(0,0,0,.18); padding:16px; font-family:ui-monospace,monospace; font-size:14px; word-break:break-all;
     }
-    .ph{
-      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-      font-size:12px; color:#777;
+    .actions{ display:flex; gap:12px; margin-top:16px; flex-wrap:wrap }
+    .btn{
+      background:var(--black); color:var(--white); border:none; padding:12px 20px; font-size:14px; cursor:pointer; text-decoration:none; display:inline-block;
     }
-    .img{
-      position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-      display:block; background:#ddd;
+    .btn.alt{
+      background:var(--tile); color:var(--black); border:1px solid rgba(0,0,0,.3);
     }
-
-    /* overlay con título al pasar mouse, muy sutil */
-    .overlay{
-      position:absolute; left:0; right:0; bottom:0; padding:8px 10px;
-      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 90%);
-      color:var(--overlayText); font-size:12px; line-height:1.3;
-      opacity:0; transition:opacity .15s ease;
+    footer{
+      margin-top:28px; display:flex; justify-content:space-between; font-size:12px; opacity:.85;
     }
-    .item:hover .overlay{opacity:1}
-
-    /* indicador “clicable” (cuando hay href) */
-    .item.link{ cursor:pointer }
-    .item.link:active{ transform: translateY(1px) }
-
-    /* estados */
-    .state{padding:16px; font-size:14px; color:#666}
-    .visually-hidden{position:absolute!important; height:1px; width:1px; overflow:hidden; clip:rect(1px,1px,1px,1px)}
+    .help{ text-decoration:underline; cursor:pointer }
+    .popover{
+      position:fixed; right:24px; bottom:24px; background:var(--white); border:1px solid rgba(0,0,0,.15);
+      width:360px; max-width:calc(100% - 48px); box-shadow:0 6px 30px rgba(0,0,0,.15); display:none;
+    }
+    .popover header{ padding:14px 16px; border-bottom:1px solid rgba(0,0,0,.1); font-weight:600 }
+    .popover .body{ padding:14px 16px; font-size:14px; line-height:1.6 }
+    .close{ float:right; cursor:pointer; font-weight:400; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div id="state" class="state">Cargando…</div>
-    <div id="grid" class="grid" hidden></div>
+    <h1>Aquí puedes encontrar tu link para setear ◡̈</h1>
+    <p class="lead">Guarda esta URL: la usarás cada vez que quieras crear un widget. Es tu acceso personal al Setup.</p>
+
+    <div class="card">
+      <div id="setup-link" class="field"></div>
+      <div class="actions">
+        <button id="copy" class="btn">Copiar URL</button>
+        <a id="go-setup" class="btn" href="/setup/">Comenzar el Setup del Grid →</a>
+      </div>
+    </div>
+
+    <footer>
+      <span>© 2025 Flujo Creativo · Sistema Notion Grid</span>
+      <span class="help" id="need-help">¿Necesitas ayuda?</span>
+    </footer>
+  </div>
+
+  <div class="popover" id="help-pop">
+    <header>Ayuda <span class="close" id="help-close">✕</span></header>
+    <div class="body">
+      <p><strong>¿Dónde está mi enlace de Setup?</strong><br>
+      Es el que ves arriba. Compártelo solo dentro de tu equipo.</p>
+
+      <p><strong>¿Soporte?</strong><br>
+      Escríbeme a <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a>.</p>
+
+      <p><strong>Compras/actualizaciones</strong><br>
+      Se gestionan por Shopify. Usa el mismo correo de compra para que tus widgets se actualicen automáticamente a Pro.</p>
+    </div>
   </div>
 
   <script>
-    // ========= Helpers =========
-    const qs = new URLSearchParams(location.search);
-    const forwardParams = (() => {
-      // Reenviamos TODOS los params (id, db, limit, etc.) a /api/grid para no romper flujos existentes.
-      const arr = [];
-      for (const [k,v] of qs.entries()) arr.push(`${encodeURIComponent(k)}=${encodeURIComponent(v)}`);
-      return arr.length ? `?${arr.join("&")}` : "";
-    })();
+    const origin = window.location.origin;
+    const setupURL = origin + "/setup/";
+    const linkEl = document.getElementById("setup-link");
+    linkEl.textContent = setupURL;
 
-    const $state = document.getElementById("state");
-    const $grid  = document.getElementById("grid");
+    document.getElementById("copy").onclick = () =>
+      navigator.clipboard.writeText(setupURL);
 
-    function showState(msg){ $state.textContent = msg; $state.hidden = false; $grid.hidden = true }
-    function showGrid(){ $state.hidden = true; $grid.hidden = false }
-
-    function el(tag, attrs={}, children=[]){
-      const n = document.createElement(tag);
-      Object.entries(attrs).forEach(([k,v])=>{
-        if (k === "class") n.className = v;
-        else if (k === "style") n.setAttribute("style", v);
-        else if (k in n) n[k] = v;
-        else n.setAttribute(k, v);
-      });
-      [].concat(children).forEach(c => n.appendChild(typeof c === "string" ? document.createTextNode(c) : c));
-      return n;
-    }
-
-    // ========= Render de tarjeta GRID estilo IG =========
-    function renderItem(item){
-      const hasHref = !!item.href;
-      const node = el("div", { class: "item" + (hasHref ? " link" : "") });
-
-      // imagen / placeholder
-      if (item.image){
-        node.appendChild(el("img", { class:"img", alt: item.title || "", src: item.image }));
-      } else {
-        node.appendChild(el("div", { class:"ph" }, "Sin imagen"));
-      }
-
-      // overlay con título al hover
-      if (item.title){
-        node.appendChild(el("div", { class:"overlay" }, item.title));
-      }
-
-      // click → abre href (si existe)
-      if (hasHref){
-        node.addEventListener("click", () => {
-          try {
-            const u = new URL(item.href);
-            window.open(u.href, "_blank", "noopener");
-          } catch {
-            // si no es URL válida, ignoramos el click
-          }
-        });
-      }
-
-      return node;
-    }
-
-    // ========= Carga de datos desde /api/grid =========
-    async function load(){
-      try{
-        const r = await fetch(`/api/grid${forwardParams}`, { headers:{ Accept:"application/json" } });
-        if(!r.ok){
-          const txt = await r.text();
-          throw new Error(`Error /api/grid ${r.status}: ${txt}`);
-        }
-        const j = await r.json();
-
-        const items = Array.isArray(j.items) ? j.items : [];
-
-        if (!items.length){
-          showState("No hay elementos para mostrar.");
-          return;
-        }
-
-        // Limpia y dibuja
-        $grid.innerHTML = "";
-        items.forEach(it => $grid.appendChild(renderItem(it)));
-        showGrid();
-      }catch(e){
-        console.error(e);
-        showState("No se pudo cargar el grid.");
-      }
-    }
-
-    load();
+    // Help
+    const pop = document.getElementById("help-pop");
+    document.getElementById("need-help").onclick = () => pop.style.display = "block";
+    document.getElementById("help-close").onclick = () => pop.style.display = "none";
   </script>
 </body>
 </html>
