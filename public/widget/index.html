@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Widget · Flujo Creativo</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root{--beige:#D9D9D9;--tile:#ECEBE8;--black:#000;--white:#fff}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:"Inter",system-ui,sans-serif;color:var(--black);background:var(--white)}
+    .wrap{max-width:980px;margin:0 auto;padding:18px}
+    .topbar{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:12px}
+    .bio-btn{background:#000;color:#fff;border:none;padding:8px 14px;font-size:13px;cursor:pointer;text-decoration:none}
+    .grid{display:grid;gap:6px;grid-template-columns:repeat(3,1fr)}
+    @media(min-width:740px){.grid{gap:10px;grid-template-columns:repeat(4,1fr)}}
+    .card{position:relative;background:#eee;aspect-ratio:1/1;overflow:hidden;border:1px solid rgba(0,0,0,.1)}
+    .card img, .card video{width:100%;height:100%;object-fit:cover;display:block}
+    .title{position:absolute;left:6px;bottom:6px;background:rgba(255,255,255,.75);padding:4px 6px;font-size:12px}
+    .empty{padding:24px;background:#fafafa;border:1px dashed #ccc;text-align:center;font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="topbar" class="topbar"></div>
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" style="display:none">Sin elementos todavía.</div>
+  </div>
+
+  <script>
+    const qp = new URLSearchParams(location.search);
+    const bio = qp.get('bio'); const bioText = qp.get('bioText') || 'Ver más';
+
+    // BIO button
+    if(bio){
+      const top = document.getElementById('topbar');
+      const a = document.createElement('a');
+      a.className='bio-btn'; a.textContent=bioText; a.href=bio; a.target='_blank'; a.rel='noopener';
+      top.appendChild(a);
+    }
+
+    async function load(){
+      try{
+        const r = await fetch('/api/grid',{headers:{Accept:'application/json'}});
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        const j = await r.json();
+        const items = Array.isArray(j.items) ? j.items : [];
+        if(!items.length){ document.getElementById('empty').style.display='block'; return; }
+
+        const grid = document.getElementById('grid');
+        items.forEach(it=>{
+          const cell = document.createElement('a');
+          cell.className='card';
+          cell.href = it.href || '#';
+          cell.target = it.href ? '_blank' : '_self';
+          const isVideo = typeof it.image === 'string' && it.image.match(/\.(mp4|webm|ogg)(\?|$)/i);
+          if(isVideo){
+            const v = document.createElement('video'); v.src=it.image; v.autoplay=false; v.loop=false; v.muted=true; v.playsInline=true;
+            cell.appendChild(v);
+          }else{
+            const img = document.createElement('img'); img.src = it.image; img.alt = it.title || '';
+            cell.appendChild(img);
+          }
+          if(it.title){
+            const t = document.createElement('div'); t.className='title'; t.textContent = it.title;
+            cell.appendChild(t);
+          }
+          grid.appendChild(cell);
+        });
+      }catch(e){
+        document.getElementById('empty').style.display='block';
+        document.getElementById('empty').textContent = 'No se pudo cargar el grid.';
+      }
+    }
+    load();
+  </script>
+</body>
+</html>
