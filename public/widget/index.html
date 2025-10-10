@@ -4,180 +4,44 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Widget · Flujo Creativo</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Oswald:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    :root{
-      --beige:#D9D9D9;
-      --tile:#ECEBE8;
-      --black:#000000;
-      --white:#ffffff;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;background:var(--white);color:var(--black);
-      font-family:"Inter",system-ui,-apple-system,sans-serif;
-      -webkit-font-smoothing:antialiased
-    }
-    .wrap{max-width:1200px;margin:0 auto;padding:12px}
-
-    /* Cabecera mínima opcional (no molesta en el embed) */
-    .head{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 8px}
-    .brand{font-family:"Oswald",sans-serif;letter-spacing:.5px;text-transform:uppercase;font-size:13px;opacity:.65}
-    .muted{color:#666;font-size:12px}
-
-    /* GRID original: tarjetas 1:1 con TÍTULO ABAJO */
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-      gap:10px;
-    }
-    .card{
-      display:flex;
-      flex-direction:column;
-      border:1px solid rgba(0,0,0,.12);
-      background:var(--tile);
-      text-decoration:none;color:inherit;
-    }
-    /* contenedor 1:1 */
-    .mediaBox{
-      position:relative;width:100%;
-      aspect-ratio:1/1;                /* moderno */
-      background:#f6f6f6;
-      overflow:hidden;
-    }
-    /* Fallback si el host ignora aspect-ratio */
-    .no-aspect .mediaBox{height:0;padding-bottom:100%}
-    .media,.media img,.media video{
-      position:absolute;inset:0;width:100%;height:100%;
-      object-fit:cover;display:block;
-    }
-    .media img{filter:saturate(1.02)}
-    .mediaBox:hover .media img{opacity:.92}
-
-    /* meta con título ABAJO (siempre visible bajo la imagen) */
-    .meta{
-      padding:10px 10px 12px;background:var(--white);
-      border-top:1px solid rgba(0,0,0,.10);
-      min-height:44px;
-    }
-    .title{
-      font-size:13px;line-height:1.35;font-weight:600;
-      overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
-    }
-
-    /* Caption opcional (debajo del título, si llega en el JSON) */
-    .caption{
-      margin-top:6px;font-size:12px;line-height:1.3;color:#444;
-      overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
-    }
-
-    /* errores */
-    .error{background:#ffe9e9;color:#a40000;border:1px solid #f3bcbc;padding:12px;margin:10px 2px;border-radius:4px}
+    html,body{ height:100%; margin:0; background:#D9D9D9 }
+    #frame{ border:0; width:100%; height:100vh; display:none }
+    #err{ font-family:system-ui,-apple-system,Inter,sans-serif; max-width:720px; margin:80px auto; padding:20px; background:#fff; border:1px solid rgba(0,0,0,.15)}
+    code{ background:#f3f3f3; padding:2px 6px }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="head">
-      <div class="brand">Flujo Creativo — Grid</div>
-      <div class="muted" id="wid"></div>
-    </div>
-
-    <div id="errors"></div>
-    <div id="grid" class="grid" aria-live="polite"></div>
-  </div>
+  <iframe id="frame" title="Flujo Creativo · Grid"></iframe>
+  <div id="err" style="display:none"></div>
 
   <script>
-    // ID de widget si usas rutas tipo /widget/<id>
-    const widgetId = (location.pathname.split("/")[2] || "").trim();
-    const widEl = document.getElementById("wid");
-    if (widgetId) widEl.textContent = "ID: " + widgetId;
+    const params = new URLSearchParams(location.search);
+    const wid = params.get('wid');
+    const iframe = document.getElementById('frame');
+    const err = document.getElementById('err');
 
-    // pequeña utilidad
-    const esc = s => (s||"").toString().replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
-    function showError(msg){ document.getElementById("errors").innerHTML = `<div class="error">${esc(msg)}</div>` }
+    async function main(){
+      if(!wid){ showErr('Falta el parámetro <code>wid</code> en la URL.'); return; }
+      const r = await fetch('/api/widgets/resolve?wid=' + encodeURIComponent(wid));
+      const j = await r.json().catch(()=>null);
+      if(!r.ok || !j || !j.ok){ showErr((j && j.error) || 'No se encontró el widget.'); return; }
 
-    // fuerza fallback si el host no soporta aspect-ratio
-    if (!CSS.supports("aspect-ratio: 1 / 1")) document.documentElement.classList.add("no-aspect");
+      // Construye la URL del widget MINI original (tu despliegue):
+      // Si usas otro host para el mini, cambia esta constante.
+      const MINI_HOST = 'https://notion-grid-mini.vercel.app/preview';
 
-    function makeCard(it){
-      const href = it.href || "#";
-      const a = document.createElement(href === "#" ? "div" : "a");
-      if (href !== "#"){ a.href = href; a.target = "_blank"; a.rel = "noopener"; }
-      a.className = "card";
-
-      const box = document.createElement("div");
-      box.className = "mediaBox";
-
-      const media = document.createElement("div");
-      media.className = "media";
-
-      const isVideo = it.image && /\.(mp4|webm|mov)(\?|$)/i.test(it.image);
-      if (isVideo){
-        media.innerHTML = `<video src="${esc(it.image)}" autoplay muted loop playsinline></video>`;
-      }else{
-        media.innerHTML = `<img src="${esc(it.image)}" alt="${esc(it.title||"")}" loading="lazy">`;
-      }
-
-      const meta = document.createElement("div");
-      meta.className = "meta";
-      const t = document.createElement("div");
-      t.className = "title";
-      t.textContent = it.title || "";
-      meta.appendChild(t);
-
-      if (it.caption){
-        const c = document.createElement("div");
-        c.className = "caption";
-        c.textContent = it.caption;
-        meta.appendChild(c);
-      }
-
-      box.appendChild(media);
-      a.appendChild(box);
-      a.appendChild(meta);
-      return a;
+      const src = `${MINI_HOST}?db=${encodeURIComponent(j.grid_db_id)}&bio=${encodeURIComponent(j.bio_db_id)}&wid=${encodeURIComponent(wid)}`;
+      iframe.src = src;
+      iframe.style.display = 'block';
     }
 
-    async function load(){
-      try{
-        const r = await fetch("/api/grid", { headers:{Accept:"application/json"} });
-        if(!r.ok) throw new Error("La API /api/grid no respondió OK");
-        const data = await r.json();
-        const items = Array.isArray(data.items) ? data.items : [];
-
-        const grid = document.getElementById("grid");
-        grid.innerHTML = "";
-
-        if (items.length === 0){
-          grid.innerHTML = `<p class="muted">Aún no hay elementos en tu Grid.</p>`;
-          return;
-        }
-
-        // Ordenar por fecha si viene (nuevo -> viejo)
-        items.sort((a,b)=>{
-          const da = +new Date(a.publish_date || a.created_time || 0);
-          const db = +new Date(b.publish_date || b.created_time || 0);
-          return db - da;
-        });
-
-        for (const it of items) grid.appendChild(makeCard(it));
-      }catch(e){
-        showError(e.message || String(e));
-      }
+    function showErr(message){
+      err.innerHTML = `<h2>404: NOT_FOUND</h2><p>${message}</p><p>Verifica que este embed sea <code>/widget?wid=XXXXX</code> y que el <em>wid</em> exista.</p>`;
+      err.style.display = 'block';
     }
 
-    load();
+    main();
   </script>
 </body>
 </html>
-<div style="margin-top:24px;border-top:1px solid rgba(0,0,0,.12);padding-top:16px">
-  <h2 style="font-family:Oswald,sans-serif">Bio Widget</h2>
-  <p style="font-size:14px">Tu enlace para embeber el Bio:</p>
-  <code id="bio-url" style="display:block;padding:10px;background:#fff;border:1px solid rgba(0,0,0,.2)">
-    https://TU-DOMINIO/bio/mi-bio
-  </code>
-  <button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('bio-url').textContent)">Copiar URL del Bio</button>
-</div>
-
