@@ -4,11 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Setup · Flujo Creativo</title>
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
+
   <style>
     :root{
       --beige:#D9D9D9;
@@ -25,55 +24,87 @@
       background:var(--beige);
       -webkit-font-smoothing:antialiased;
     }
-    .wrap{max-width:980px;margin:0 auto;padding:32px 20px 80px}
+
+    .wrap{max-width:1080px;margin:0 auto;padding:32px 20px 80px}
+
+    /* Header */
     header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
     .brand{font-family:"Oswald",sans-serif;letter-spacing:.5px;font-size:22px;text-transform:uppercase}
 
-    h1{font-family:"Oswald",sans-serif;font-weight:600;font-size:32px;line-height:1.1;margin:0 0 14px}
-    p{line-height:1.65;margin:0 0 16px}
-    .muted{font-size:14px;color:#333}
-    .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.15));
-      border:1px solid rgba(0,0,0,.12);
-      padding:28px 24px;
-      margin-bottom:20px;
-    }
-    .form-row{display:grid;grid-template-columns:1fr;gap:14px;margin:16px 0}
-    .form-group label{display:block;font-weight:600;margin-bottom:8px}
-    .form-group input[type="text"]{
-      width:100%;padding:12px;border:1px solid rgba(0,0,0,.2);background:var(--white);font-size:14px;
-    }
-    .form-group input[type="text"]:focus{outline:2px solid var(--black);outline-offset:2px}
-    .toggle{display:flex;align-items:center;gap:10px;margin:10px 0}
-    .toggle input{width:18px;height:18px}
+    /* Tabs */
+    .tabs{display:flex;gap:6px;justify-content:center;margin-bottom:32px;border-bottom:1px solid rgba(0,0,0,.15);padding-bottom:2px}
+    .tab{background:transparent;border:none;padding:10px 20px;font-size:15px;cursor:pointer;color:var(--black);font-weight:600;transition:.15s}
+    .tab:hover{background:rgba(0,0,0,.05)}
+    .tab.active{background:var(--black);color:var(--white)}
+
+    /* Content */
+    .content{display:none}
+    .content.active{display:block}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.15));border:1px solid rgba(0,0,0,.12);padding:40px 32px;margin-bottom:20px}
+
+    h1{font-family:"Oswald",sans-serif;font-weight:600;font-size:36px;line-height:1.1;margin:0 0 12px}
+    h2{font-family:"Oswald",sans-serif;font-weight:600;font-size:24px;margin:28px 0 12px}
+    h3{font-size:17px;font-weight:600;margin:20px 0 8px}
+    p{line-height:1.6;margin:0 0 16px}
+    ul,ol{margin:0 0 16px 18px}
+
+    /* Steps */
+    .steps{margin-top:24px}
+    .step{background:var(--tile);border:1px solid rgba(0,0,0,.18);margin-bottom:12px}
+    .step-header{padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:12px;font-weight:600;font-size:16px}
+    .step-header:hover{background:rgba(0,0,0,.03)}
+    .step-body{display:none;padding:0 20px 20px;border-top:1px solid rgba(0,0,0,.08)}
+    .step.open .step-body{display:block}
+    .step.open .step-header{background:rgba(0,0,0,.04)}
+
+    /* Table */
+    table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+    th,td{border:1px solid rgba(0,0,0,.15);padding:10px 12px;text-align:left}
+    th{background:rgba(0,0,0,.06);font-weight:600}
+    code{background:rgba(0,0,0,.08);padding:2px 6px;font-family:ui-monospace,monospace;font-size:13px}
+
+    /* Form */
+    .form-group{margin:20px 0}
+    .form-group label{display:block;font-weight:600;margin-bottom:8px;font-size:15px}
     .hint{font-size:13px;color:#555;margin-top:6px}
-    .section-title{font-family:"Oswald",sans-serif;font-size:22px;margin:24px 0 8px}
-    .inline-grid{display:grid;gap:12px}
-    @media(min-width:720px){ .inline-grid{grid-template-columns:1fr 1fr} }
+    input[type="text"]{width:100%;padding:12px;border:1px solid rgba(0,0,0,.2);background:var(--white);font-size:14px;font-family:inherit}
+    input[type="text"]:focus{outline:2px solid var(--black);outline-offset:2px}
+    .toggle{display:flex;align-items:center;gap:12px;margin:16px 0;cursor:pointer}
+    .toggle input{width:20px;height:20px;cursor:pointer}
 
-    .btn{
-      background:var(--black);color:var(--white);border:none;padding:12px 22px;
-      font-size:14px;cursor:pointer;display:inline-block;text-decoration:none
-    }
+    /* Collapsible */
+    .collapsible{color:var(--black);text-decoration:underline;cursor:pointer;font-size:14px;margin:12px 0;display:inline-block;font-weight:600}
+    .collapsible-content{display:none;margin-top:12px}
+    .collapsible-content.open{display:block}
+
+    /* Buttons */
+    .btn{background:var(--black);color:var(--white);border:none;padding:12px 24px;font-size:14px;cursor:pointer;display:inline-block;text-decoration:none;margin-top:16px}
     .btn:hover{opacity:.92}
-    .btn-secondary{background:var(--tile);color:var(--black);border:1px solid rgba(0,0,0,.28)}
-    .btn-row{display:flex;gap:10px;flex-wrap:wrap}
+    .btn.secondary{background:var(--tile);color:var(--black);border:1px solid rgba(0,0,0,.3)}
 
-    .result{
-      display:none;margin-top:18px;padding:18px;background:rgba(0,128,0,.06);
-      border:1px solid rgba(0,128,0,.3)
-    }
-    .result code{display:block;padding:12px;background:var(--white);margin:10px 0;font-family:ui-monospace,monospace}
-    .error{
-      display:none;margin-top:18px;padding:14px;background:rgba(180,0,0,.08);
-      border:1px solid rgba(180,0,0,.35);color:#520000;font-size:14px
-    }
-    .foot{
-      display:flex;align-items:center;justify-content:space-between;margin-top:28px;
-      font-size:12px;color:#222
-    }
+    /* Links */
     a{color:var(--black);text-decoration:underline}
     a:hover{opacity:.8}
+
+    /* FAQ */
+    .faq-item{margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid rgba(0,0,0,.08)}
+    .faq-item:last-child{border:none}
+    .faq-item h3{font-size:16px;margin:0 0 8px}
+
+    /* Account */
+    .account-info{background:rgba(255,255,255,.3);border:1px solid rgba(0,0,0,.12);padding:20px}
+    .info-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(0,0,0,.08)}
+    .info-row:last-child{border:none}
+    .info-label{font-weight:600}
+    .info-value{color:#333}
+    .upgrade{display:inline-block;background:#000;color:#fff;padding:4px 10px;font-size:12px;font-weight:700;margin-left:8px;text-decoration:none}
+
+    /* Result */
+    .result{display:none;margin-top:24px;padding:20px;background:rgba(0,0,0,.05);border:1px solid rgba(0,0,0,.2)}
+    .result code{display:block;padding:12px;background:var(--white);margin:8px 0;overflow:auto}
+
+    /* Footer */
+    footer{margin-top:24px;font-size:12px;display:flex;justify-content:space-between;align-items:center;color:#111}
   </style>
 </head>
 <body>
@@ -82,190 +113,282 @@
       <div class="brand">Flujo Creativo</div>
     </header>
 
-    <div class="card">
-      <h1>Configura tu Widget de Grid</h1>
-      <p class="muted">Completa estos campos y genera tu URL de widget. Después podrás <strong>/embed</strong> esta URL en Notion.</p>
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="start">Empieza aquí</button>
+      <button class="tab" data-tab="setup">Setup</button>
+      <button class="tab" data-tab="help">Help</button>
+      <button class="tab" data-tab="account">Account</button>
+    </nav>
 
-      <div class="form-row">
+    <!-- TAB 1: Empieza aquí -->
+    <section class="content active" id="start">
+      <div class="card">
+        <h1>Planifica tu feed con un Grid en Notion</h1>
+        <p style="font-size:17px;margin-bottom:28px">
+          En pocos pasos tendrás una galería estilo Instagram que se actualiza automáticamente.
+        </p>
+
+        <h2>Pasos</h2>
+        <div class="steps">
+          <!-- Paso 1 -->
+          <div class="step open">
+            <div class="step-header">1) Prepara tu base de datos en Notion</div>
+            <div class="step-body">
+              <p>Duplica nuestro template (recomendado) o usa tu propia base.</p>
+
+              <div class="option" style="background:rgba(255,255,255,.4);border:1px solid rgba(0,0,0,.12);padding:18px;margin:16px 0">
+                <h3 style="margin:0 0 8px">Opción A: Duplicar template (recomendado)</h3>
+                <p>Duplicas, pruebas que todo funcione y luego migras si quieres.</p>
+                <a class="btn" target="_blank" href="https://www.notion.so/Flujo-Creativo-Instagram-Grid-28673654be06818d8561f78d28ed6f3b">Duplicar template →</a>
+              </div>
+
+              <div class="option" style="background:rgba(255,255,255,.4);border:1px solid rgba(0,0,0,.12);padding:18px;margin:16px 0">
+                <h3 style="margin:0 0 8px">Opción B: Usar tu propia base</h3>
+                <p>Asegúrate de estas propiedades exactas:</p>
+
+                <table>
+                  <thead><tr><th>Propiedad</th><th>Tipo</th><th>Propósito</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>Name</code></td><td>Text</td><td>Título (tooltip al pasar)</td></tr>
+                    <tr><td><code>Publish Date</code></td><td>Date</td><td>Orden del grid</td></tr>
+                    <tr><td><code>Attachment</code></td><td>Files &amp; Media</td><td>Imágenes/Vídeos</td></tr>
+                    <tr><td><code>*Image Source</code></td><td>Select</td><td>Attachment / Link / Canva Design</td></tr>
+                    <tr><td><code>*Link</code></td><td>Text</td><td>Imagen/Vídeo externo</td></tr>
+                    <tr><td><code>*Canva Link</code></td><td>URL</td><td>Embed desde Canva</td></tr>
+                  </tbody>
+                </table>
+                <p class="hint">* Requeridas para funciones Pro.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paso 2 -->
+          <div class="step">
+            <div class="step-header">2) Crea y conecta tu integración</div>
+            <div class="step-body">
+              <ol style="line-height:1.8">
+                <li>Abre <a target="_blank" href="https://www.notion.so/my-integrations">Notion → My integrations</a> y crea una integración.</li>
+                <li>Copia el <strong>Integration Token</strong>.</li>
+                <li>En tu base de datos, menú <strong>•••</strong> → <strong>Connections</strong> → selecciona tu integración.</li>
+              </ol>
+              <label class="toggle"><input type="checkbox" id="step2-done"> Confirmo que conecté la integración a mi base</label>
+            </div>
+          </div>
+
+          <!-- Paso 3 -->
+          <div class="step">
+            <div class="step-header">3) Genera y embebe tu widget</div>
+            <div class="step-body">
+              <ol style="line-height:1.8">
+                <li>Ve a la pestaña <a href="#" data-goto="setup">Setup</a>.</li>
+                <li>Ingresa tu Token y las URLs de tus bases de Notion (Grid y Bio).</li>
+                <li>Haz clic en <strong>Generar Widget</strong> y copia tu URL única.</li>
+                <li>En Notion escribe <code>/embed</code> y pega tu URL.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: Setup -->
+    <section class="content" id="setup">
+      <div class="card">
+        <h1>Widget Setup</h1>
+
         <div class="form-group">
           <label>Notion Integration Token</label>
-          <input id="token-input" type="text" placeholder="secret_xxxxx..." autocomplete="off" />
-          <div class="hint">Crea tu integración en <a target="_blank" href="https://www.notion.so/my-integrations">notion.so/my-integrations</a> y copia el token.</div>
+          <input type="text" id="token-input" placeholder="secret_xxxxx..." />
+          <span class="collapsible" data-target="tok-help">+ Instrucciones</span>
+          <div class="collapsible-content" id="tok-help">
+            <ol style="font-size:14px;line-height:1.7;margin-top:12px">
+              <li>Visita <a target="_blank" href="https://www.notion.so/my-integrations">Notion → My integrations</a></li>
+              <li>New integration → copia el token</li>
+              <li>Conecta esa integración a tus bases (Grid y Bio)</li>
+            </ol>
+          </div>
         </div>
 
         <div class="form-group">
-          <label>Database URL (fuente)</label>
-          <input id="db-input" type="text" placeholder="https://www.notion.so/tu-workspace/XXXXXXXXXXXX?pvs=4" autocomplete="off" />
-          <div class="hint">Abre la base de datos en vista de página completa, luego copia la URL del navegador (no uses vistas enlazadas).</div>
+          <label>Notion Database URL — Grid</label>
+          <input type="text" id="db-grid" placeholder="https://www.notion.so/… (URL de la base de contenido)" />
+          <p class="hint">Abre la base como página completa y copia la URL de la barra del navegador (de la base real, no una vista vinculada).</p>
         </div>
 
-        <label class="toggle">
-          <input id="integration-done" type="checkbox" />
-          <span>Ya conecté la integración a esta base de datos en Notion</span>
-        </label>
-      </div>
-
-      <div class="section-title">Opcional: BIO del widget</div>
-      <div class="toggle">
-        <input id="bio-enabled" type="checkbox" />
-        <span>Activar BIO</span>
-      </div>
-      <div class="inline-grid" id="bio-fields" style="display:none">
         <div class="form-group">
-          <label>Texto del botón BIO</label>
-          <input id="bio-text" type="text" placeholder="Ver más" value="Ver más" />
+          <label>Notion Database URL — Bio</label>
+          <input type="text" id="db-bio" placeholder="https://www.notion.so/… (URL de la base de ajustes de Bio)" />
+          <p class="hint">Si tu template ya incluye “Bio Settings”, usa esa URL.</p>
         </div>
-        <div class="form-group">
-          <label>URL del BIO</label>
-          <input id="bio-url" type="text" placeholder="https://linktr.ee/tuusuario o https://tuweb.com" />
+
+        <button class="btn" id="generate">Generar Widget →</button>
+
+        <div class="result" id="result">
+          <h3>¡Listo! Copia tu URL única y embébela en Notion.</h3>
+          <p>Widget URL:</p>
+          <code id="widget-url">https://tu-dominio/widget/?wid=XXXXXX</code>
+          <button class="btn secondary" id="copy-url">Copiar URL</button>
+        </div>
+      </div>
+
+      <footer>
+        <span>© 2025 Flujo Creativo · Sistema Notion Grid</span>
+        <a href="#" data-goto="help">¿Necesitas ayuda?</a>
+      </footer>
+    </section>
+
+    <!-- TAB 3: Help -->
+    <section class="content" id="help">
+      <div class="card">
+        <h1>Preguntas Frecuentes</h1>
+
+        <div class="faq-item">
+          <h3>¿Cómo empiezo?</h3>
+          <p>Sigue la guía de <a href="#" data-goto="start">Empieza aquí</a>. Cuando tengas tu token y tus URLs, ve a <a href="#" data-goto="setup">Setup</a> y genera tu URL embebible.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>¿Cómo configuro correctamente mi base?</h3>
+          <p>Debes tener (mínimo): <strong>Name</strong> (Text), <strong>Publish Date</strong> (Date) y <strong>Attachment</strong> (Files &amp; Media). Para funciones Pro, agrega <strong>Image Source</strong> (Select), <strong>Link</strong> (Text) y <strong>Canva Link</strong> (URL). Puedes copiar el formato desde nuestro <a target="_blank" href="https://www.notion.so/Flujo-Creativo-Instagram-Grid-28673654be06818d8561f78d28ed6f3b">template</a>.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Me da error de acceso a la base</h3>
+          <p>Suele ser porque pegaste la URL de una página contenedora o una vista vinculada. Abre la base de datos fuente en página completa y copia esa URL. Verifica también que la integración esté conectada a la base correcta.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>¿Puedo usar bases existentes?</h3>
+          <p>Sí. Respeta los nombres exactos de las columnas especiales y conecta la integración. El resto de tus columnas pueden quedarse como están.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Canva / Vídeos (Pro)</h3>
+          <p>Para Canva, usa el enlace de <em>Embed</em> en “Canva Link” y selecciona “Canva Design” en “Image Source”. Para vídeos, súbelos en Attachment o pega un enlace en “Link”.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Licencias y planes</h3>
+          <p>Compras y upgrades se gestionan por Shopify. Si compras con el mismo email, tu cuenta se actualiza automáticamente. Si necesitas ayuda, escríbenos a <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a>.</p>
+        </div>
+
+        <div class="faq-item">
+          <h3>Reembolsos</h3>
+          <p>Para mantenerlo simple, no ofrecemos reembolsos. Prueba primero con el plan básico; si todo va bien, puedes actualizar a Pro cuando quieras.</p>
         </div>
       </div>
 
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn" id="generate-widget">Generar Widget →</button>
-      </div>
+      <footer>
+        <span>© 2025 Flujo Creativo · Sistema Notion Grid</span>
+        <a href="#" data-goto="setup">Volver a Setup</a>
+      </footer>
+    </section>
 
-      <div id="error-box" class="error"></div>
+    <!-- TAB 4: Account (placeholder) -->
+    <section class="content" id="account">
+      <div class="card">
+        <h1>Cuenta</h1>
 
-      <div id="widget-result" class="result">
-        <strong>¡Widget generado!</strong>
-        <p>Usa esta URL para <code>/embed</code> en Notion:</p>
-        <code id="widget-url">https://…</code>
-        <div class="btn-row">
-          <button class="btn btn-secondary" id="copy-url">Copiar URL</button>
-          <a id="open-url" class="btn" target="_blank" href="#">Probar ahora</a>
+        <div class="account-info">
+          <div class="info-row"><span class="info-label">Email</span><span class="info-value" id="user-email">—</span></div>
+          <div class="info-row"><span class="info-label">Nombre</span><span class="info-value" id="user-name">—</span></div>
+          <div class="info-row"><span class="info-label">Tipo de cuenta</span><span class="info-value" id="account-type">Basic <a class="upgrade" href="#" title="Pronto">Upgrade</a></span></div>
         </div>
       </div>
-    </div>
 
-    <div class="foot">
-      <span>© 2025 Flujo Creativo · Sistema Notion Grid</span>
-      <a href="/index.html">Volver a inicio</a>
-    </div>
+      <footer>
+        <span>© 2025 Flujo Creativo · Sistema Notion Grid</span>
+        <a href="#" data-goto="help">Ayuda</a>
+      </footer>
+    </section>
   </div>
 
   <script>
-    // Mostrar/ocultar campos de BIO
-    const bioEnabled = document.getElementById('bio-enabled');
-    const bioFields = document.getElementById('bio-fields');
-    bioEnabled.addEventListener('change', () => {
-      bioFields.style.display = bioEnabled.checked ? 'grid' : 'none';
+    // --- Tabs ---
+    document.querySelectorAll('.tab').forEach(tab=>{
+      tab.addEventListener('click',()=>{
+        const id = tab.dataset.tab;
+        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+      });
+    });
+    // Enlaces internos data-goto
+    document.querySelectorAll('[data-goto]').forEach(a=>{
+      a.addEventListener('click',e=>{
+        e.preventDefault();
+        const id=a.dataset.goto;
+        document.querySelector(`.tab[data-tab="${id}"]`).click();
+        window.scrollTo({top:0,behavior:'smooth'});
+      });
     });
 
-    function extractDbId(url){
-      // intenta extraer el último bloque de 32 caracteres hex (con o sin guiones)
-      try{
-        const clean = url.trim();
-        // patrones: .../xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx o .../xxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-        const hex32 = clean.match(/[a-f0-9]{32}/i);
-        if(hex32) return hex32[0].toLowerCase();
-        const dashed = clean.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i);
-        if(dashed) return dashed[0].replace(/-/g,'').toLowerCase();
-      }catch(_) {}
-      return '';
-    }
+    // Collapsibles
+    document.querySelectorAll('.collapsible').forEach(trigger=>{
+      trigger.addEventListener('click',()=>{
+        const target = document.getElementById(trigger.dataset.target);
+        target.classList.toggle('open');
+        trigger.textContent = target.classList.contains('open') ? '− Ocultar instrucciones' : '+ Instrucciones';
+      });
+    });
 
-    function randomId(len=6){
-      const chars='abcdefghijklmnopqrstuvwxyz0123456789';
-      let out=''; for(let i=0;i<len;i++) out+=chars[Math.floor(Math.random()*chars.length)];
-      return out;
-    }
+    // --- Generar widget (llamada real al backend) ---
+    const BASE_URL = typeof window !== 'undefined' ? `${location.protocol}//${location.host}` : '';
+    const btn = document.getElementById('generate');
+    const out = document.getElementById('result');
+    const codeEl = document.getElementById('widget-url');
 
-    async function tryCreateOnBackend(payload){
-      // Intento "best effort": si no existe el backend, seguimos con mock.
-      try{
-        const r = await Promise.race([
-          fetch('/api/widgets/create', {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify(payload)
-          }),
-          new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')), 6000))
-        ]);
-        if(!r.ok) throw new Error('HTTP '+r.status);
+    btn.addEventListener('click', async ()=>{
+      const token = (document.getElementById('token-input').value || '').trim();
+      const gridUrl = (document.getElementById('db-grid').value || '').trim();
+      const bioUrl  = (document.getElementById('db-bio').value  || '').trim();
+      const done    = document.getElementById('step2-done').checked;
+
+      if (!token || !gridUrl) {
+        alert('Completa al menos Token y Database URL — Grid.');
+        return;
+      }
+      if (!done) {
+        alert('Marca la casilla de confirmación de la integración.');
+        return;
+      }
+
+      try {
+        const r = await fetch('/api/widgets/create', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ notionToken:token, gridDbUrl:gridUrl, bioDbUrl:bioUrl })
+        });
         const j = await r.json();
-        if(j && j.widgetUrl) return j.widgetUrl;
-      }catch(e){}
-      return null;
-    }
+        if (!r.ok || !j.ok) throw new Error(j.error || 'Error creando el widget');
 
-    const genBtn = document.getElementById('generate-widget');
-    const errorBox = document.getElementById('error-box');
-    const resultBox = document.getElementById('widget-result');
-    const widgetUrlEl = document.getElementById('widget-url');
-    const copyBtn = document.getElementById('copy-url');
-    const openBtn = document.getElementById('open-url');
+        const url = j.widgetUrl.startsWith('http') ? j.widgetUrl : `${BASE_URL}${j.widgetUrl}`;
+        codeEl.textContent = url;
+        out.style.display = 'block';
+        out.scrollIntoView({behavior:'smooth'});
 
-    genBtn.addEventListener('click', async () => {
-      errorBox.style.display = 'none';
-      errorBox.textContent = '';
-      resultBox.style.display = 'none';
-
-      const token = document.getElementById('token-input').value.trim();
-      const dbUrl = document.getElementById('db-input').value.trim();
-      const confirmed = document.getElementById('integration-done').checked;
-
-      if(!token || !dbUrl){
-        errorBox.textContent = 'Por favor completa Notion Integration Token y Database URL.';
-        errorBox.style.display = 'block';
-        return;
-      }
-      if(!confirmed){
-        errorBox.textContent = 'Confirma que conectaste la integración a la base de datos (checkbox).';
-        errorBox.style.display = 'block';
-        return;
-      }
-
-      genBtn.disabled = true;
-      genBtn.textContent = 'Generando…';
-
-      const dbId = extractDbId(dbUrl) || 'db';
-      const base = window.location.origin;
-      const id = randomId();
-
-      const payload = {
-        notionToken: token,
-        notionDatabaseUrl: dbUrl,
-        bio: bioEnabled.checked ? {
-          text: document.getElementById('bio-text').value.trim() || 'Ver más',
-          url: (document.getElementById('bio-url').value || '').trim()
-        } : null
-      };
-
-      // 1) Intento backend (si existe)
-      const serverUrl = await tryCreateOnBackend(payload);
-
-      // 2) Fallback sin backend (si no hay API)
-      const params = new URLSearchParams();
-      params.set('db', dbId);
-      if(payload.bio && payload.bio.url){
-        params.set('bio', payload.bio.url);
-        params.set('bioText', payload.bio.text);
-      }
-      const mockUrl = `${base}/widget/${id}?${params.toString()}`;
-
-      const finalUrl = serverUrl || mockUrl;
-
-      widgetUrlEl.textContent = finalUrl;
-      openBtn.href = finalUrl;
-      resultBox.style.display = 'block';
-      resultBox.scrollIntoView({behavior:'smooth', block:'start'});
-
-      genBtn.disabled = false;
-      genBtn.textContent = 'Generar Widget →';
-    });
-
-    copyBtn.addEventListener('click', async () => {
-      const txt = widgetUrlEl.textContent;
-      try{
-        await navigator.clipboard.writeText(txt);
-        copyBtn.textContent = 'Copiado';
-        setTimeout(()=>copyBtn.textContent='Copiar URL', 1200);
-      }catch(_){
-        copyBtn.textContent = 'Copiar (falló)';
-        setTimeout(()=>copyBtn.textContent='Copiar URL', 1200);
+      } catch (err) {
+        console.error(err);
+        alert('No se pudo generar el widget. Revisa las URLs y el token.');
       }
     });
+
+    // Copiar
+    document.getElementById('copy-url').addEventListener('click', async ()=>{
+      const v = document.getElementById('widget-url').textContent.trim();
+      await navigator.clipboard.writeText(v);
+      alert('URL copiada.');
+    });
+
+    // Placeholder mínimo de Account (si más adelante llenamos desde backend)
+    (function hydrateAccount(){
+      try {
+        const email = new URLSearchParams(location.search).get('email');
+        if (email) document.getElementById('user-email').textContent = email;
+      } catch {}
+    })();
   </script>
 </body>
 </html>
