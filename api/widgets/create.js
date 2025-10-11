@@ -1,72 +1,74 @@
-// /api/widgets/create.js
 export const config = { runtime: 'nodejs' };
 
-function extractDbId(url) {
-  if (!url) return null;
-  // Busca un ID de 32 hex (con o sin guiones)
-  const m = String(url).match(/[a-f0-9]{32}|[a-f0-9-]{36}/i);
-  if (!m) return null;
-  return m[0].replace(/-/g, "").toLowerCase();
+const { SUPABASE_URL, SUPABASE_SERVICE_ROLE, BASE_URL } = process.env;
+
+// extrae un ID de base de Notion (32 chars) desde la URL pegada
+function extractNotionDbId(dbUrl) {
+  if (!dbUrl) return '';
+  const m = dbUrl.match(/[0-9a-f]{32}/i);
+  return m ? m[0] : '';
 }
 
 function randomId(n = 6) {
-  const abc = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let s = "";
-  for (let i = 0; i < n; i++) s += abc[Math.floor(Math.random() * abc.length)];
-  return s;
-}
-
-async function getSupabase() {
-  const { createClient } = await import('@supabase/supabase-js');
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_ANON_KEY;
-  if (!url || !key) throw new Error("Missing Supabase env (SUPABASE_URL / SUPABASE_SERVICE_ROLE).");
-  return createClient(url, key);
+  return Math.random().toString(36).slice(2, 2 + n);
 }
 
 export default async function handler(req, res) {
   try {
-    if (req.method !== 'POST') {
-      res.status(405).json({ ok:false, error:'Method not allowed' });
-      return;
+    if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method not allowed' });
+
+    const { token, notionToken, databaseUrl } = req.body || {};
+    if (!token || !notionToken || !databaseUrl) {
+      return res.status(400).json({ ok: false, error: 'Missing token/notionToken/databaseUrl' });
     }
 
-    const { notionToken, gridDbUrl, bioDbUrl } = req.body || {};
-    if (!notionToken || !gridDbUrl) {
-      res.status(400).json({ ok:false, error:'notionToken y gridDbUrl son obligatorios' });
-      return;
-    }
+    // 1) Busca el account por setup_token
+    const accUrl = new URL(`${SUPABASE_URL}/rest/v1/accounts`);
+    accUrl.searchParams.set('select', 'id,plan');
+    accUrl.searchParams.set('setup_token', `eq.${token}`);
 
-    const gridDbId = extractDbId(gridDbUrl);
-    const bioDbId  = extractDbId(bioDbUrl || "");
-    if (!gridDbId) {
-      res.status(400).json({ ok:false, error:'No pude extraer el ID de la base Grid (revisa la URL)' });
-      return;
-    }
-
-    const wid = randomId(6);
-
-    // Guarda en Supabase
-    const supabase = await getSupabase();
-    const row = {
-      wid,
-      grid_db_id: gridDbId,
-      bio_db_id: bioDbId,
-      notion_token: notionToken,
-      created_at: new Date().toISOString()
-    };
-
-    const { error } = await supabase.from('widgets').upsert(row, { onConflict: 'wid' });
-    if (error) throw error;
-
-    // Devuelve URL embebible
-    res.status(200).json({
-      ok: true,
-      wid,
-      widgetUrl: `/widget/?wid=${wid}`
+    const accRes = await fetch(accUrl, {
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE}`
+      }
     });
+    if (!accRes.ok) return res.status(500).json({ ok: false, error: `Supabase ${accRes.status}` });
+    const accRows = await accRes.json();
+    if (!accRows.length) return res.status(404).json({ ok: false, error: 'Account not found' });
+
+    const accountId = accRows[0].id;
+
+    // 2) Genera widget
+    const widgetId = randomId(6);
+    const notionDbId = extractNotionDbId(databaseUrl);
+    if (!notionDbId) return res.status(400).json({ ok: false, error: 'Invalid Notion Database URL' });
+
+    // 3) Inserta en widgets
+    const wRes = await fetch(`${SUPABASE_URL}/rest/v1/widgets`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation'
+      },
+      body: JSON.stringify({
+        id: widgetId,
+        account_id: accountId,
+        notion_database_id: notionDbId,
+        notion_integration_token: notionToken
+      })
+    });
+
+    if (!wRes.ok) {
+      const t = await wRes.text();
+      return res.status(500).json({ ok: false, error: `Insert widget ${wRes.status}: ${t}` });
+    }
+
+    const widgetUrl = `${BASE_URL}/preview?widget=${widgetId}`;
+    res.json({ ok: true, widgetId, widgetUrl });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ ok:false, error: String(err.message || err) });
+    res.status(500).json({ ok: false, error: String(err) });
   }
 }
