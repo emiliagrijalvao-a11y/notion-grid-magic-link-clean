@@ -1,74 +1,72 @@
-export const config = { runtime: 'nodejs' };
+// api/widgets/create.js
+export const config = { runtime: "nodejs" };
 
-const { SUPABASE_URL, SUPABASE_SERVICE_ROLE, BASE_URL } = process.env;
+import { createClient } from "@supabase/supabase-js";
 
-// extrae un ID de base de Notion (32 chars) desde la URL pegada
-function extractNotionDbId(dbUrl) {
-  if (!dbUrl) return '';
-  const m = dbUrl.match(/[0-9a-f]{32}/i);
-  return m ? m[0] : '';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE;
+const BASE_URL = process.env.BASE_URL; // ej: https://notion-grid-magic-link-clean-git-main-flujo-creativo.vercel.app
+
+function supa() {
+  return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE, { auth: { persistSession: false } });
 }
 
-function randomId(n = 6) {
+function shortId(n = 6) {
   return Math.random().toString(36).slice(2, 2 + n);
+}
+
+// Extrae el ID de base de datos (32 hex) de una URL de Notion
+function extractDbId(input) {
+  if (!input) return null;
+  const m = String(input).match(/[0-9a-f]{32}/i);
+  return m ? m[0] : null;
 }
 
 export default async function handler(req, res) {
   try {
-    if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method not allowed' });
-
-    const { token, notionToken, databaseUrl } = req.body || {};
-    if (!token || !notionToken || !databaseUrl) {
-      return res.status(400).json({ ok: false, error: 'Missing token/notionToken/databaseUrl' });
+    if (req.method !== "POST") return res.status(405).json({ ok: false, error: "Method not allowed" });
+    const { email, notionToken, databaseUrl, name } = req.body || {};
+    if (!email || !notionToken || !databaseUrl) {
+      return res.status(400).json({ ok: false, error: "Faltan campos: email, notionToken, databaseUrl" });
     }
 
-    // 1) Busca el account por setup_token
-    const accUrl = new URL(`${SUPABASE_URL}/rest/v1/accounts`);
-    accUrl.searchParams.set('select', 'id,plan');
-    accUrl.searchParams.set('setup_token', `eq.${token}`);
+    const databaseId = extractDbId(databaseUrl);
+    if (!databaseId) return res.status(400).json({ ok: false, error: "Database URL inválida" });
 
-    const accRes = await fetch(accUrl, {
-      headers: {
-        apikey: SUPABASE_SERVICE_ROLE,
-        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE}`
-      }
-    });
-    if (!accRes.ok) return res.status(500).json({ ok: false, error: `Supabase ${accRes.status}` });
-    const accRows = await accRes.json();
-    if (!accRows.length) return res.status(404).json({ ok: false, error: 'Account not found' });
+    const sb = supa();
 
-    const accountId = accRows[0].id;
+    // 1) Asegura usuario
+    await sb.from("fc_users").upsert({ email, name: name || null }, { onConflict: "email" });
 
-    // 2) Genera widget
-    const widgetId = randomId(6);
-    const notionDbId = extractNotionDbId(databaseUrl);
-    if (!notionDbId) return res.status(400).json({ ok: false, error: 'Invalid Notion Database URL' });
+    // 2) Determina plan por licencias activas
+    let plan = "basic";
+    const lic = await sb
+      .from("fc_licenses")
+      .select("*")
+      .eq("email", email)
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-    // 3) Inserta en widgets
-    const wRes = await fetch(`${SUPABASE_URL}/rest/v1/widgets`, {
-      method: 'POST',
-      headers: {
-        apikey: SUPABASE_SERVICE_ROLE,
-        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE}`,
-        'Content-Type': 'application/json',
-        Prefer: 'return=representation'
-      },
-      body: JSON.stringify({
-        id: widgetId,
-        account_id: accountId,
-        notion_database_id: notionDbId,
-        notion_integration_token: notionToken
-      })
+    if (lic.data && lic.data.plan === "pro") plan = "pro";
+
+    // 3) Crea widget
+    const id = shortId(6);
+    const insert = await sb.from("fc_widgets").insert({
+      id,
+      email,
+      database_id: databaseId,
+      notion_token: notionToken,
+      plan,
     });
 
-    if (!wRes.ok) {
-      const t = await wRes.text();
-      return res.status(500).json({ ok: false, error: `Insert widget ${wRes.status}: ${t}` });
-    }
+    if (insert.error) throw insert.error;
 
-    const widgetUrl = `${BASE_URL}/preview?widget=${widgetId}`;
-    res.json({ ok: true, widgetId, widgetUrl });
+    const widgetUrl = `${BASE_URL}/widget/?id=${id}`;
+    return res.status(200).json({ ok: true, id, plan, widgetUrl });
   } catch (err) {
-    res.status(500).json({ ok: false, error: String(err) });
+    console.error(err);
+    return res.status(500).json({ ok: false, error: String(err) });
   }
 }
