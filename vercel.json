@@ -1,6 +1,12 @@
 {
-  "rewrites": [
-    { "source": "/w/:id", "destination": "/api/w?id=:id" },
-    { "source": "/b/:id", "destination": "/api/b?id=:id" }
+  "headers": [
+    { "source": "/", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
+    { "source": "/index.html", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
+    { "source": "/setup", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
+    { "source": "/setup/", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
+    { "source": "/setup/(.*)", "headers": [{ "key": "Cache-Control", "value": "no-store" }] }
+  ],
+  "redirects": [
+    { "source": "/setup.html", "destination": "/setup/", "permanent": true }
   ]
 }
