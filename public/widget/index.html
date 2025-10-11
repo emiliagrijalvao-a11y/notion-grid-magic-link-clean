@@ -1,69 +1,86 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Widget · Flujo Creativo</title>
   <style>
-    html,body{height:100%;margin:0}
-    body{background:#fff;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,sans-serif}
-    .wrap{height:100%;display:flex;flex-direction:column}
-    header{padding:8px 12px;font-size:12px;color:#222;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
-    header .brand{font-weight:700;letter-spacing:.4px}
-    .view{flex:1;min-height:0}
-    iframe{width:100%;height:100%;border:0;display:block}
-    .err{padding:24px;color:#b00}
-    a{color:#000}
+    :root{ --bg:#fff; --fg:#000; --muted:#888;}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,sans-serif}
+    .grid{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
+      padding:6px;max-width:960px;margin:0 auto;
+    }
+    .cell{position:relative;background:#eee;overflow:hidden;aspect-ratio:1/1}
+    .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:12px}
+    .img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .ov{
+      position:absolute;inset:0;background:rgba(0,0,0,.45);
+      color:#fff;opacity:0;transition:.15s;display:flex;align-items:flex-end;
+    }
+    .cell:hover .ov{opacity:1}
+    .title{padding:10px;font-weight:600;font-size:13px}
+    .err{max-width:800px;margin:24px auto;padding:12px;border:1px solid #f00;color:#900;background:#fee}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">Flujo Creativo · Widget</div>
-      <a href="/" target="_blank" rel="noopener">¿Qué es esto?</a>
-    </header>
-    <div class="view" id="view">
-      <div class="err" id="err" style="display:none"></div>
-    </div>
-  </div>
+  <div id="error" class="err" style="display:none"></div>
+  <div id="grid" class="grid" aria-live="polite"></div>
 
   <script>
-    // Host del mini original (no tocar el diseño del widget mini)
-    const MINI_HOST = 'https://notion-grid-mini.vercel.app/preview';
+    const params = new URLSearchParams(location.search);
+    const id = params.get("id");
+    const $err = document.getElementById("error");
+    const $grid = document.getElementById("grid");
 
-    function q(name){ return new URLSearchParams(location.search).get(name) }
+    function showError(msg){
+      $err.textContent = msg;
+      $err.style.display = "block";
+    }
 
-    async function boot(){
-      const wid = q('wid');
-      const view = document.getElementById('view');
-      const err  = document.getElementById('err');
-
-      if (!wid) {
-        err.style.display='block';
-        err.textContent='Falta el parámetro ?wid=';
-        return;
-      }
-
-      try {
-        const r = await fetch(`/api/widgets/resolve?wid=${encodeURIComponent(wid)}`);
+    async function load(){
+      if(!id){ showError("Falta parámetro id en la URL del widget."); return; }
+      try{
+        const r = await fetch(`/api/grid?id=${encodeURIComponent(id)}`);
         const j = await r.json();
-        if (!r.ok || !j.ok) throw new Error(j.error || 'No encontrado');
-
-        const params = new URLSearchParams();
-        params.set('db',  j.gridDbId);
-        if (j.bioDbId) params.set('bio', j.bioDbId);
-
-        const src = `${MINI_HOST}?${params.toString()}`;
-        const ifr = document.createElement('iframe');
-        ifr.src = src;
-        view.innerHTML='';
-        view.appendChild(ifr);
-      } catch (e) {
-        err.style.display='block';
-        err.textContent = 'No pudimos cargar el widget: ' + (e.message || e);
+        if(!r.ok || !j.ok){ throw new Error(j.error || `HTTP ${r.status}`); }
+        render(j.items || []);
+      }catch(e){
+        showError("No se pudo cargar el contenido del widget. " + e.message);
       }
     }
-    boot();
+
+    function render(items){
+      if(!items.length){ showError("No hay elementos para mostrar (revisa tu base de Notion)."); return; }
+      const frag = document.createDocumentFragment();
+      for(const it of items){
+        const a = document.createElement(it.href ? "a" : "div");
+        a.className = "cell";
+        if(it.href){ a.href = it.href; a.target = "_blank"; rel="noopener" }
+
+        const img = document.createElement("img");
+        img.className = "img";
+        img.src = it.image;
+        img.alt = it.title || "";
+        a.appendChild(img);
+
+        const ov = document.createElement("div");
+        ov.className = "ov";
+        const t = document.createElement("div");
+        t.className = "title";
+        t.textContent = it.title || "";
+        ov.appendChild(t);
+        a.appendChild(ov);
+
+        frag.appendChild(a);
+      }
+      $grid.innerHTML = "";
+      $grid.appendChild(frag);
+    }
+
+    load();
   </script>
 </body>
 </html>
