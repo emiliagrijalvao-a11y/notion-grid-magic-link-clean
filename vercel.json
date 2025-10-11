@@ -1,26 +1,15 @@
 {
-  "version": 2,
   "trailingSlash": true,
+  "redirects": [
+    { "source": "/setup", "destination": "/setup/", "permanent": true }
+  ],
   "headers": [
     {
-      "source": "/(.*)\\.(html)$",
-      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
-    },
-    {
-      "source": "/",
-      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
-    },
-    {
-      "source": "/setup",
-      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
-    },
-    {
       "source": "/setup/",
-      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
-    },
-    {
-      "source": "/api/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" },
+        { "key": "Referrer-Policy", "value": "no-referrer" }
+      ]
     }
   ]
 }
