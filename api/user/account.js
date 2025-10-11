@@ -1,39 +1,54 @@
-// /api/user/account.js
-import { supabase } from "./_supabase.js";
+export const config = { runtime: 'nodejs' };
+
+const { SUPABASE_URL, SUPABASE_SERVICE_ROLE } = process.env;
 
 export default async function handler(req, res) {
-  if (req.method !== "GET") return res.status(405).json({ ok: false, error: "Method Not Allowed" });
-
   try {
-    const email = (req.query.email || "").toString().trim().toLowerCase();
-    if (!email) return res.status(400).json({ ok: false, error: "Falta email" });
+    const token = req.query.token || '';
+    if (!token) return res.status(400).json({ ok: false, error: 'Missing token' });
 
-    // asegurar user
-    await supabase.from("fc_users").upsert({ email }, { onConflict: "email" });
+    const url = new URL(`${SUPABASE_URL}/rest/v1/accounts`);
+    url.searchParams.set('select', 'id,email,name,plan,licenses(*),widgets(*)');
+    url.searchParams.set('setup_token', `eq.${token}`);
 
-    const { data: user } = await supabase.from("fc_users").select("*").eq("email", email).maybeSingle();
-    const { data: licenses } = await supabase.from("fc_licenses").select("*").eq("user_email", email).order("issued_at", { ascending: false });
-    const { data: widgets } = await supabase.from("fc_widgets").select("*").eq("user_email", email).order("created_at", { ascending: false });
+    const r = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE,
+        Authorization: `Bearer ${SUPABASE_SERVICE_ROLE}`,
+        Prefer: 'count=exact'
+      }
+    });
 
+    if (!r.ok) {
+      const t = await r.text();
+      return res.status(500).json({ ok: false, error: `Supabase ${r.status}: ${t}` });
+    }
+
+    const rows = await r.json();
+    if (!rows.length) return res.status(404).json({ ok: false, error: 'Account not found' });
+
+    const acc = rows[0];
+
+    // Normalizamos al formato que usa la UI
     const out = {
-      email,
-      name: user?.name || null,
-      accountType: user?.plan || "basic",
-      licenses: (licenses || []).map(l => ({
-        type: l.type === "pro" ? "Pro" : "Basic",
-        key: l.license_key || null,
-        date: new Date(l.issued_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+      email: acc.email,
+      name: acc.name || '',
+      accountType: acc.plan, // 'basic' | 'pro'
+      licenses: (acc.licenses || []).map(l => ({
+        type: l.type,
+        key: l.key,
+        date: l.issued_at
       })),
-      widgets: (widgets || []).map(w => ({
-        id: w.short_id,
-        token: w.token_mask || null,
-        databaseId: w.database_id || null,
-        url: w.widget_url || null
+      widgets: (acc.widgets || []).map(w => ({
+        id: w.id,
+        token: '•••••••••••••••••••',
+        databaseId: w.notion_database_id,
+        url: `${process.env.BASE_URL}/preview?widget=${w.id}`
       }))
     };
 
-    return res.json(out);
+    res.json(out);
   } catch (err) {
-    return res.status(500).json({ ok: false, error: String(err) });
+    res.status(500).json({ ok: false, error: String(err) });
   }
 }
