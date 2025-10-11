@@ -1,9 +1,26 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "rewrites": [
-    { "source": "/setup/(.*)", "destination": "/setup/index.html" },
-    { "source": "/widget/(.*)", "destination": "/widget/index.html" },
-    { "source": "/bio/(.*)",    "destination": "/bio/index.html" }
+  "version": 2,
+  "trailingSlash": true,
+  "headers": [
+    {
+      "source": "/(.*)\\.(html)$",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    },
+    {
+      "source": "/",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    },
+    {
+      "source": "/setup",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    },
+    {
+      "source": "/setup/",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    }
   ]
 }
