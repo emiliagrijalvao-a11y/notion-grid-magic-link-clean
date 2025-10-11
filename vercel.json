@@ -1,15 +1,6 @@
 {
-  "trailingSlash": true,
-  "redirects": [
-    { "source": "/setup", "destination": "/setup/", "permanent": true }
-  ],
-  "headers": [
-    {
-      "source": "/setup/",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store" },
-        { "key": "Referrer-Policy", "value": "no-referrer" }
-      ]
-    }
+  "rewrites": [
+    { "source": "/w/:id", "destination": "/api/w?id=:id" },
+    { "source": "/b/:id", "destination": "/api/b?id=:id" }
   ]
 }
