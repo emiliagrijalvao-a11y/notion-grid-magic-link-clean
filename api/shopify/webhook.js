@@ -10,9 +10,8 @@ const supabaseAdmin = createClient(
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.FROM_EMAIL || 'Flujo Creativo <noreply@example.com>';
 
-// Función para generar token simple pero seguro
 function generateAccessToken() {
-  return crypto.randomBytes(32).toString('hex'); // 64 caracteres hexadecimales
+  return crypto.randomBytes(32).toString('hex');
 }
 
 async function readRawBody(req) {
@@ -47,6 +46,8 @@ module.exports = async (req, res) => {
       return res.status(400).json({ ok: false, error: 'No email in order' });
     }
 
+    console.log('[webhook] Processing order for:', email);
+
     // 1. Buscar o crear cliente CON TOKEN
     const { data: existing } = await supabaseAdmin
       .from('clients')
@@ -60,16 +61,15 @@ module.exports = async (req, res) => {
       clientId = existing.id;
       accessToken = existing.access_token;
       
-      // Si no tiene token, generarle uno
       if (!accessToken) {
         accessToken = generateAccessToken();
         await supabaseAdmin
           .from('clients')
           .update({ access_token: accessToken, name })
           .eq('id', clientId);
+        console.log('[webhook] Token generated for existing client:', clientId);
       }
     } else {
-      // Cliente nuevo: crear con token
       accessToken = generateAccessToken();
       const { data: newClient, error: errClient } = await supabaseAdmin
         .from('clients')
@@ -79,6 +79,7 @@ module.exports = async (req, res) => {
       
       if (errClient) throw errClient;
       clientId = newClient.id;
+      console.log('[webhook] New client created:', clientId);
     }
 
     // 2. Crear widget
@@ -94,9 +95,10 @@ module.exports = async (req, res) => {
       .single();
 
     if (errWidget) throw errWidget;
+    console.log('[webhook] Widget created:', widget.id);
 
-    // 3. URL con el token simple
-    const accountUrl = `${process.env.BASE_URL}/setup.html?token=${accessToken}`;
+    // 3. URL con el token
+    const accountUrl = `https://notion-grid-magic-link-clean.vercel.app/setup.html?token=${accessToken}`;
 
     // 4. Enviar email
     await resend.emails.send({
@@ -118,7 +120,8 @@ module.exports = async (req, res) => {
       `
     });
 
-    return res.status(200).json({ ok: true });
+    console.log('[webhook] Email sent to:', email);
+    return res.status(200).json({ ok: true, clientId, widgetId: widget.id });
   } catch (e) {
     console.error('[webhook error]', e);
     return res.status(500).json({ ok: false, error: e.message });
