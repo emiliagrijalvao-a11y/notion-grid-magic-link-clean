@@ -36,6 +36,11 @@
     code.block{ display:block; padding:12px; background:var(--white); margin:8px 0; font-family:ui-monospace,monospace; }
     ul.bullets{ padding-left:18px }
     .notice{ background:rgba(0,0,0,.05); padding:12px; font-size:14px; }
+    .info-row{ display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(0,0,0,.08) }
+    .info-row:last-child{ border:none }
+    .info-label{ font-weight:700 }
+    .loading{ text-align:center; padding:20px; color:#666 }
+    .error{ background:rgba(255,0,0,.1); border:1px solid rgba(255,0,0,.3); padding:12px; color:#c00 }
   </style>
 </head>
 <body>
@@ -110,7 +115,7 @@
         <h1>Preguntas Frecuentes</h1>
 
         <h3>¿Cómo creo el widget?</h3>
-        <p>En <strong>Setup</strong> pega tu Integration Token y las URLs de las bases (Grid + Bio). Pulsa “Generar Widget”. Copia la URL resultante y embébela en Notion con <code>/embed</code>.</p>
+        <p>En <strong>Setup</strong> pega tu Integration Token y las URLs de las bases (Grid + Bio). Pulsa "Generar Widget". Copia la URL resultante y embébela en Notion con <code>/embed</code>.</p>
 
         <h3>Me sale 404 en el embed</h3>
         <p>Revisa que el enlace sea <code>.../widget?wid=XXXXX</code> y que tus URLs de Notion sean de la <u>base fuente</u> (no vistas). Asegúrate de haber conectado la integración a esas bases.</p>
@@ -126,13 +131,21 @@
     <!-- TAB 4: Account -->
     <div class="content" id="account">
       <div class="card">
-        <h1>Account</h1>
-        <p>Esta sección mostrará tus datos básicos, licencias y widgets cuando conectemos el backend. (Placeholder)</p>
+        <h1>Información Personal</h1>
+        <div id="account-content">
+          <div class="loading">Cargando datos...</div>
+        </div>
       </div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    const SUPABASE_URL = 'https://xltixvgmahvclxhwzwpk.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhsdGl4dmdtYWh2Y2x4aHd6d3BrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3MjE2NTcsImV4cCI6MjA3NTI5NzY1N30.NtP6bHkb7LGw6rClgtGGn6z-Dz-YE7ETXEUCzwDrqBU';
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     // Tabs
     document.querySelectorAll('.tab').forEach(tab=>{
       tab.addEventListener('click', ()=>{
@@ -167,6 +180,86 @@
     };
 
     $('copy-url').onclick = ()=> navigator.clipboard.writeText($('widget-url').textContent);
+
+    // Load Account Data
+    async function loadAccountData() {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('t');
+      
+      const container = $('account-content');
+      
+      if (!token) {
+        container.innerHTML = '<p class="error">Falta el token en la URL. Usa el enlace de tu email.</p>';
+        return;
+      }
+
+      try {
+        // 1. Buscar magic link
+        const { data: link, error: errLink } = await supabase
+          .from('magic_links')
+          .select('id, client_id, widget_id, expires_at')
+          .eq('token', token)
+          .maybeSingle();
+
+        if (errLink) throw errLink;
+        if (!link) {
+          container.innerHTML = '<p class="error">Enlace inválido o expirado.</p>';
+          return;
+        }
+
+        if (new Date(link.expires_at) < new Date()) {
+          container.innerHTML = '<p class="error">Tu enlace ha expirado. Solicita uno nuevo.</p>';
+          return;
+        }
+
+        // 2. Cargar cliente
+        const { data: client, error: errClient } = await supabase
+          .from('clients')
+          .select('id, email, name')
+          .eq('id', link.client_id)
+          .single();
+
+        if (errClient) throw errClient;
+
+        // 3. Cargar widget
+        const { data: widget, error: errWidget } = await supabase
+          .from('widgets')
+          .select('id, type, plan, config')
+          .eq('id', link.widget_id)
+          .single();
+
+        if (errWidget) throw errWidget;
+
+        // Renderizar
+        container.innerHTML = `
+          <div class="info-row">
+            <span class="info-label">Email</span>
+            <span>${client.email}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Nombre</span>
+            <span>${client.name || 'Nombre del Usuario'} <a href="#" style="margin-left:8px">Editar</a></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Tipo de cuenta</span>
+            <span>${widget.plan === 'pro' ? 'Pro Account' : 'Basic Account'} ${widget.plan !== 'pro' ? '<span class="btn-secondary" style="padding:4px 10px;font-size:12px;margin-left:8px">Actualizar a Pro</span>' : ''}</span>
+          </div>
+          <h2 style="margin-top:24px">Tus Licencias</h2>
+          <p style="color:#666;font-size:14px">Las licencias aparecerán aquí después de tu compra.</p>
+          <h2>Tus Widgets</h2>
+          <p style="color:#666;font-size:14px">Widget ID: ${widget.id}</p>
+          <p style="color:#666;font-size:14px">Tipo: ${widget.type}</p>
+          <p style="color:#666;font-size:14px">Plan: ${widget.plan}</p>
+        `;
+
+      } catch (e) {
+        console.error(e);
+        container.innerHTML = `<p class="error">Error: ${e.message}</p>`;
+      }
+    }
+
+    // Cargar datos al abrir la página
+    loadAccountData();
   </script>
 </body>
 </html>
