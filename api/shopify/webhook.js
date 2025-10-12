@@ -1,152 +1,130 @@
-// /api/shopify/webhook.js
+const crypto = require('crypto');
+const { createClient } = require('@supabase/supabase-js');
+const { Resend } = require('resend');
 
-export const config = { api: { bodyParser: false } };
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE
+);
 
-import crypto from 'crypto'; // Sí puedes dejar crypto, fetch ya es global
+const resend = new Resend(process.env.RESEND_API_KEY);
+const FROM = process.env.FROM_EMAIL || 'Flujo Creativo <noreply@example.com>';
 
-export default async function handler(req, res) {
-  if (req.method !== "POST")
-    return res.status(405).json({ ok: false, error: "Method not allowed" });
+// Función para generar token simple pero seguro
+function generateAccessToken() {
+  return crypto.randomBytes(32).toString('hex'); // 64 caracteres hexadecimales
+}
 
-  // Leer raw body completo
-  const raw = await new Promise((resolve, reject) => {
-    let data = [];
-    req.on("data", chunk => data.push(chunk));
-    req.on("end", () => resolve(Buffer.concat(data)));
-    req.on("error", reject);
+async function readRawBody(req) {
+  return await new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', chunk => (data += chunk));
+    req.on('end', () => resolve(data));
+    req.on('error', reject);
   });
-
-  // Validar HMAC si usas SHOPIFY_WEBHOOK_SECRET
-  const secret = process.env.SHOPIFY_WEBHOOK_SECRET;
-  if (secret) {
-    const hmacHeader = req.headers["x-shopify-hmac-sha256"];
-    const generated = crypto.createHmac("sha256", secret).update(raw).digest("base64");
-    if (hmacHeader !== generated)
-      return res.status(401).json({ ok: false, error: "Invalid HMAC" });
-  }
-
-  // Parsear contenido del body
-  let order = {};
-  try { order = JSON.parse(raw.toString("utf-8")); }
-  catch (e) { return res.status(400).json({ ok: false, error: "Invalid JSON" }); }
-
-  // Validar email
-  const email = order.email || (order.customer && order.customer.email);
-  if (!email)
-    return res.status(400).json({ ok: false, error: "No email in order" });
-
-  // Variables requeridas
-  const SUPABASE_URL = process.env.SUPABASE_URL;
-  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const RESEND_API_KEY = process.env.RESEND_API_KEY;
-  const RESEND_FROM = process.env.RESEND_FROM;
-  const BASE_URL = process.env.BASE_URL || "https://flujo-creativo.vercel.app/account";
-
-  // Crear/buscar cliente en Supabase
-  const { id: client_id } = await upsertClient(email, order, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-  if (!client_id)
-    return res.status(500).json({ ok: false, error: "Can't create/find client" });
-
-  // Crear el widget
-  const widget_id = await createWidget(client_id, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
-  // Generar magic link y guardar en Supabase
-  const token = await createMagicLink(client_id, widget_id, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-  if (!token)
-    return res.status(500).json({ ok: false, error: "Can't create magic link" });
-
-  // Enviar email de accesso con Resend
-  const enlace = `${BASE_URL}?t=${token}`;
-  const enviado = await sendResendEmail(email, enlace, RESEND_API_KEY, RESEND_FROM);
-
-  if (!enviado)
-    return res.status(500).json({ ok: false, error: "Failed to send email" });
-
-  return res.status(200).json({ ok: true, client_id, token, enlace });
 }
 
-// -------- FUNCIONES AUXILIARES --------
+module.exports = async (req, res) => {
+  try {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ ok: false, error: 'Method not allowed' });
+    }
 
-async function upsertClient(email, order, url, apiKey) {
-  const res = await fetch(`${url}/rest/v1/clients`, {
-    method: "POST",
-    headers: {
-      "apikey": apiKey,
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      "Prefer": "resolution=merge-duplicates, return=representation"
-    },
-    body: JSON.stringify({
-      email,
-      name: [
-        (order.customer && order.customer.first_name) || "",
-        (order.customer && order.customer.last_name) || ""
-      ].join(" ").trim(),
-      shopify_customer_id: order.customer && order.customer.id
-    })
-  });
-  const body = await res.json();
-  return body[0] || {};
-}
+    const raw = await readRawBody(req);
+    let order = {};
+    try { 
+      order = JSON.parse(raw); 
+    } catch { 
+      return res.status(400).json({ ok: false, error: 'Invalid JSON' }); 
+    }
 
-async function createWidget(client_id, url, apiKey) {
-  const res = await fetch(`${url}/rest/v1/widgets`, {
-    method: "POST",
-    headers: {
-      "apikey": apiKey,
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      "Prefer": "return=representation"
-    },
-    body: JSON.stringify({ client_id })
-  });
-  const body = await res.json();
-  return body[0] ? body[0].id : undefined;
-}
+    const email = order?.email || order?.customer?.email;
+    const firstName = order?.customer?.first_name || '';
+    const lastName = order?.customer?.last_name || '';
+    const name = `${firstName} ${lastName}`.trim() || null;
 
-function randomToken(length = 16) {
-  return crypto.randomBytes(length).toString("hex");
-}
+    if (!email) {
+      return res.status(400).json({ ok: false, error: 'No email in order' });
+    }
 
-async function createMagicLink(client_id, widget_id, url, apiKey) {
-  const token = randomToken();
-  const res = await fetch(`${url}/rest/v1/magic_links`, {
-    method: "POST",
-    headers: {
-      "apikey": apiKey,
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      "Prefer": "return=representation"
-    },
-    body: JSON.stringify({
-      client_id,
-      widget_id,
-      token,
-      created_at: new Date().toISOString()
-    })
-  });
-  const body = await res.json();
-  return body[0] ? body[0].token : undefined;
-}
+    // 1. Buscar o crear cliente CON TOKEN
+    const { data: existing } = await supabaseAdmin
+      .from('clients')
+      .select('id, access_token')
+      .eq('email', email)
+      .maybeSingle();
 
-async function sendResendEmail(email, enlace, apiKey, from) {
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      from,
-      to: email,
-      subject: "Tu acceso a Instagram Grid - Flujo Creativo",
+    let clientId, accessToken;
+    
+    if (existing?.id) {
+      clientId = existing.id;
+      accessToken = existing.access_token;
+      
+      // Si no tiene token, generarle uno
+      if (!accessToken) {
+        accessToken = generateAccessToken();
+        await supabaseAdmin
+          .from('clients')
+          .update({ access_token: accessToken, name })
+          .eq('id', clientId);
+      }
+    } else {
+      // Cliente nuevo: crear con token
+      accessToken = generateAccessToken();
+      const { data: newClient, error: errClient } = await supabaseAdmin
+        .from('clients')
+        .insert({ email, name, access_token: accessToken })
+        .select('id')
+        .single();
+      
+      if (errClient) throw errClient;
+      clientId = newClient.id;
+    }
+
+    // 2. Crear widget
+    const { data: widget, error: errWidget } = await supabaseAdmin
+      .from('widgets')
+      .insert({
+        client_id: clientId,
+        type: 'ig_grid',
+        plan: 'pro',
+        config: {}
+      })
+      .select('id')
+      .single();
+
+    if (errWidget) throw errWidget;
+
+    // 3. URL con el token simple
+    const accountUrl = `${process.env.BASE_URL}/setup.html?token=${accessToken}`;
+
+    // 4. Enviar email
+    await resend.emails.send({
+      from: FROM,
+      to: [email],
+      subject: 'Tu acceso a Instagram Grid - Flujo Creativo',
       html: `
-        <p>Hola, aquí tienes tu enlace de acceso:</p>
-        <p><a href="${enlace}" style="background:#18181B;color:white;padding:12px 28px;text-decoration:none;border-radius:4px;font-family:inherit;display:inline-block">Abrir mi cuenta</a></p>
-        <p>O copia este link:<br/><code>${enlace}</code></p>
-        <p>¿Necesitas ayuda? Responde a este email.</p>`
-    })
-  });
-  return res.ok;
-}
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+          <h2>¡Gracias por tu compra!</h2>
+          <p>Hola ${name || 'cliente'}, aquí tienes tu enlace de acceso:</p>
+          <p style="margin:24px 0">
+            <a href="${accountUrl}" style="display:inline-block;padding:12px 24px;background:#000;color:#fff;text-decoration:none;border-radius:4px">Abrir mi cuenta</a>
+          </p>
+          <p style="font-size:14px;color:#666">O copia este link en tu navegador:</p>
+          <p style="font-size:13px;word-break:break-all;color:#333">${accountUrl}</p>
+          <hr style="margin:32px 0;border:none;border-top:1px solid #ddd"/>
+          <p style="font-size:13px;color:#666">¿Necesitas ayuda? Responde a este email.</p>
+        </div>
+      `
+    });
 
+    return res.status(200).json({ ok: true });
+  } catch (e) {
+    console.error('[webhook error]', e);
+    return res.status(500).json({ ok: false, error: e.message });
+  }
+};
+
+module.exports.config = {
+  api: { bodyParser: false }
+};
