@@ -2,14 +2,13 @@
 
 export const config = { api: { bodyParser: false } };
 
-import crypto from 'crypto';
-import fetch from 'node-fetch';
+import crypto from 'crypto'; // Sí puedes dejar crypto, fetch ya es global
 
 export default async function handler(req, res) {
   if (req.method !== "POST")
     return res.status(405).json({ ok: false, error: "Method not allowed" });
 
-  // Leer raw body completo para HMAC y parseo
+  // Leer raw body completo
   const raw = await new Promise((resolve, reject) => {
     let data = [];
     req.on("data", chunk => data.push(chunk));
@@ -17,7 +16,7 @@ export default async function handler(req, res) {
     req.on("error", reject);
   });
 
-  // --- Validar HMAC si usas SHOPIFY_WEBHOOK_SECRET ---
+  // Validar HMAC si usas SHOPIFY_WEBHOOK_SECRET
   const secret = process.env.SHOPIFY_WEBHOOK_SECRET;
   if (secret) {
     const hmacHeader = req.headers["x-shopify-hmac-sha256"];
@@ -26,37 +25,37 @@ export default async function handler(req, res) {
       return res.status(401).json({ ok: false, error: "Invalid HMAC" });
   }
 
-  // Parsear contenido
+  // Parsear contenido del body
   let order = {};
   try { order = JSON.parse(raw.toString("utf-8")); }
   catch (e) { return res.status(400).json({ ok: false, error: "Invalid JSON" }); }
 
-  // Validar email (en order.email directo o order.customer.email)
+  // Validar email
   const email = order.email || (order.customer && order.customer.email);
   if (!email)
     return res.status(400).json({ ok: false, error: "No email in order" });
 
-  // VARIABLES
+  // Variables requeridas
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
   const RESEND_FROM = process.env.RESEND_FROM;
-  const BASE_URL = process.env.BASE_URL || "https://TU_DOMINIO/account";
+  const BASE_URL = process.env.BASE_URL || "https://flujo-creativo.vercel.app/account";
 
-  // 1. Crear/buscar cliente en Supabase
+  // Crear/buscar cliente en Supabase
   const { id: client_id } = await upsertClient(email, order, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   if (!client_id)
     return res.status(500).json({ ok: false, error: "Can't create/find client" });
 
-  // 2. Crear un widget (opcional: puedes omitir si no usas widgets por compra)
+  // Crear el widget
   const widget_id = await createWidget(client_id, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-  // 3. Generar magic link y guardar en tabla
+  // Generar magic link y guardar en Supabase
   const token = await createMagicLink(client_id, widget_id, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   if (!token)
     return res.status(500).json({ ok: false, error: "Can't create magic link" });
 
-  // 4. Enviar email con Resend
+  // Enviar email de accesso con Resend
   const enlace = `${BASE_URL}?t=${token}`;
   const enviado = await sendResendEmail(email, enlace, RESEND_API_KEY, RESEND_FROM);
 
@@ -66,7 +65,7 @@ export default async function handler(req, res) {
   return res.status(200).json({ ok: true, client_id, token, enlace });
 }
 
-// ------- FUNCIONES AUXILIARES ABAJO --------
+// -------- FUNCIONES AUXILIARES --------
 
 async function upsertClient(email, order, url, apiKey) {
   const res = await fetch(`${url}/rest/v1/clients`, {
@@ -150,3 +149,4 @@ async function sendResendEmail(email, enlace, apiKey, from) {
   });
   return res.ok;
 }
+
