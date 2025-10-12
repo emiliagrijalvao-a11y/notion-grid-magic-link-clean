@@ -1,6 +1,6 @@
-const crypto = require('crypto');
-const { createClient } = require('@supabase/supabase-js');
-const { Resend } = require('resend');
+import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
 
 const supabaseAdmin = createClient(
   process.env.SUPABASE_URL,
@@ -23,7 +23,7 @@ async function readRawBody(req) {
   });
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
       return res.status(405).json({ ok: false, error: 'Method not allowed' });
@@ -126,8 +126,8 @@ module.exports = async (req, res) => {
     console.error('[webhook error]', e);
     return res.status(500).json({ ok: false, error: e.message });
   }
-};
+}
 
-module.exports.config = {
+export const config = {
   api: { bodyParser: false }
 };
