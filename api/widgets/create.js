@@ -43,7 +43,25 @@ async function createWidgetInSupabase(payload) {
 async function sendEmail(to, widgetUrl) {
   if (!to || !RESEND_API_KEY || !FROM_EMAIL) return;
 
-  const html = `...`; // Mantén tu HTML de ejemplo.
+  const html = `
+  <div style="font-family:Inter,Arial,sans-serif;color:#000;background:#D9D9D9;padding:28px">
+    <div style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #ddd;padding:24px">
+      <h2 style="margin:0 0 12px 0;font-family:Oswald,Arial,sans-serif;letter-spacing:.5px">Tu widget está listo</h2>
+      <p style="margin:0 0 16px 0;line-height:1.6">
+        Copia y pega este enlace en tu Notion con <strong>/embed</strong>:
+      </p>
+      <p style="margin:12px 0 20px 0">
+        <a href="${widgetUrl}" style="display:inline-block;background:#000;color:#fff;padding:12px 18px;text-decoration:none">Ir al Setup del widget</a>
+      </p>
+      <div style="font-family:ui-monospace,monospace;font-size:13px;background:#f7f7f7;border:1px solid #eee;padding:10px;word-break:break-all">
+        ${widgetUrl}
+      </div>
+      <p style="margin-top:18px;font-size:13px;color:#333">
+        ¿Dudas? Escríbeme a <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a>.
+      </p>
+      <p style="margin-top:6px;font-size:12px;color:#666">© 2025 Flujo Creativo</p>
+    </div>
+  </div>`;
 
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -67,8 +85,9 @@ async function sendEmail(to, widgetUrl) {
 
 export default async function handler(req, res) {
   try {
-    if (req.method !== 'POST')
+    if (req.method !== 'POST') {
       return res.status(405).json({ success: false, error: 'Method Not Allowed' });
+    }
 
     const { notionToken, gridDbUrl, bioDbUrl, email, plan } = req.body || {};
     if (!notionToken || !gridDbUrl) {
