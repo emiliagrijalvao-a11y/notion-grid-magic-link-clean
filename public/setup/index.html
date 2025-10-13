@@ -1,4 +1,3 @@
-<!-- setup v1.0 -->
 <!doctype html>
 <html lang="es">
 <head>
@@ -16,8 +15,8 @@
   </style>
 </head>
 <body>
-  <h1>Conecta tu Notion</h1>
-  <p>Escribe tu email para generar tu Magic Link.</p>
+  <h1>Widget Setup</h1>
+  <p>Escribe tu email para generar tu Magic Link y entrar a tu cuenta.</p>
 
   <form id="f">
     <input id="email" type="email" placeholder="tu-email@ejemplo.com" required />
@@ -27,7 +26,7 @@
   <div id="msg" class="result"></div>
 
   <script>
-    const f   = document.getElementById("f");
+    const f = document.getElementById("f");
     const msg = document.getElementById("msg");
     f.addEventListener("submit", async (e) => {
       e.preventDefault();
