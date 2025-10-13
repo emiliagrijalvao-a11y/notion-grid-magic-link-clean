@@ -1,13 +1,25 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
-  "redirects": [
-    { "source": "/", "destination": "/setup/", "permanent": false }
+  "routes": [
+    { "src": "^/$", "dest": "/index.html" },
+    { "src": "^/setup/?$", "dest": "/setup/index.html" },
+    { "src": "^/help/?$", "dest": "/help/index.html" },
+    { "src": "^/account/?$", "dest": "/account/index.html" },
+    { "src": "^/widget/?$", "dest": "/widget/index.html" }
   ],
-  "rewrites": [
-    { "source": "/setup",  "destination": "/public/setup/index.html" },
-    { "source": "/setup/", "destination": "/public/setup/index.html" },
-    { "source": "/widget",  "destination": "/public/widget/index.html" },
-    { "source": "/widget/", "destination": "/public/widget/index.html" }
+  "headers": [
+    {
+      "source": "/(.*).html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" }
+      ]
+    },
+    {
+      "source": "/setup/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" }
+      ]
+    }
   ]
 }
