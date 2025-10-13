@@ -16,24 +16,17 @@ export default async function handler(req, res) {
     const baseNoSlash = baseRaw.replace(/\/+$/, "");
     const root = baseNoSlash.replace(/\/rest\/v1$/i, "");
     const REST = `${root}/rest/v1`;
-
     const key = process.env.SUPABASE_SERVICE_ROLE;
     if (!root || !key) return res.status(500).json({ error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE" });
 
-    const headers = {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
-      Prefer: "return=representation"
-    };
-
+    const headers = { apikey: key, Authorization: `Bearer ${key}`, Accept: "application/json", "Content-Type": "application/json" };
     const ins = await fetch(`${REST}/sites`, {
       method: "POST",
       headers,
-      body: JSON.stringify({ notion_database_id, customer_id })
+      body: JSON.stringify({ customer_id, notion_database_id }),
     });
     const text = await ins.text();
-    const data = ins.ok ? (text ? JSON.parse(text) : []) : null;
+    const data = ins.ok && text ? JSON.parse(text) : null;
 
     await fetch(`${REST}/logs`, {
       method: "POST",
