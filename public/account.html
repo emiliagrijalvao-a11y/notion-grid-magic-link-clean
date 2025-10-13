@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Mi cuenta</title>
+</head>
+<body>
+  <script>
+    const p = new URLSearchParams(location.search);
+    const cid = p.get("customer_id");
+    if (cid) {
+      location.replace(`/mi-cuenta.html?customer_id=${encodeURIComponent(cid)}`);
+    } else {
+      location.replace(`/setup/`);
+    }
+  </script>
+</body>
+</html>
