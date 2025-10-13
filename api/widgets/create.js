@@ -1,69 +1,54 @@
 // api/widgets/create.js
-import { createClient } from '@supabase/supabase-js';
-
-export const config = { runtime: 'nodejs' };
-
-const supabaseUrl = process.env.SUPABASE_URL;
-const serviceKey  = process.env.SUPABASE_SERVICE_ROLE;
-const baseUrl     = process.env.BASE_URL;
-
-const supabase = createClient(supabaseUrl, serviceKey, {
-  auth: { persistSession: false }
-});
-
 export default async function handler(req, res) {
+  // CORS simple
+  if (req.method === "OPTIONS") {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    return res.status(204).end();
+  }
+  res.setHeader("Access-Control-Allow-Origin", "*");
+
+  if (req.method !== "POST") return res.status(405).json({ error: "method not allowed" });
+
+  const { notion_database_id, customer_id } = req.body || {};
+  if (!notion_database_id || !customer_id) return res.status(400).json({ error: "missing fields" });
+
+  const baseRaw = process.env.SUPABASE_URL || "";
+  const baseNoSlash = baseRaw.replace(/\/+$/, "");
+  const root = baseNoSlash.replace(/\/rest\/v1$/i, "");
+  const REST = `${root}/rest/v1`;
+
+  const key = process.env.SUPABASE_SERVICE_ROLE;
+  const headers = {
+    apikey: key,
+    Authorization: `Bearer ${key}`,
+    "Content-Type": "application/json",
+    Prefer: "return=representation"
+  };
+
   try {
-    if (req.method !== 'POST') {
-      return res.status(405).json({ ok: false, error: 'Method not allowed' });
-    }
+    const ins = await fetch(`${REST}/sites`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ notion_database_id, customer_id })
+    });
+    const text = await ins.text();
+    const data = ins.ok ? (text ? JSON.parse(text) : []) : null;
 
-    // ✅ CAPTURAR email y plan del body (vienen del frontend)
-    const { notion_token, grid_db_url, bio_db_url, email, plan } = req.body || {};
-
-    if (!notion_token || !grid_db_url) {
-      return res.status(400).json({ ok: false, error: 'Faltan campos obligatorios' });
-    }
-
-    const config = { sources: ['attachment', 'link', 'canva'], version: 1 };
-
-    // ✅ INSERTAR con email y plan del cliente
-    const { data, error } = await supabase
-      .from('widgets')
-      .insert([{
-        type: 'ig_grid',
-        plan: plan || 'pro',  // ✅ Usar el plan que viene del frontend
-        config,
-        grid_db_url,
-        bio_db_url: bio_db_url || null,
-        notion_token,
-        email: email || null,  // ✅ Guardar el email del cliente
-      }])
-      .select('id')
-      .single();
-
-    if (error) {
-      console.error('Supabase error:', error);
-      return res.status(500).json({ 
-        ok: false, 
-        error: `Supabase insert error: ${error.message || JSON.stringify(error)}` 
-      });
-    }
-
-    // ✅ IMPORTANTE: La URL debe apuntar a /setup?id=XXX (no /widget?id=XXX)
-    // Porque el cliente ya está EN /setup y solo necesita el widget embebible
-    const widgetUrl = `${baseUrl.replace(/\/$/, '')}/widget?id=${data.id}`;
-
-    return res.status(200).json({ 
-      ok: true, 
-      widget_url: widgetUrl,
-      widget_id: data.id
+    await fetch(`${REST}/logs`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(
+        ins.ok
+          ? { customer_id, event: "create-widget-ok",    detail: { notion_database_id } }
+          : { customer_id, event: "create-widget-error", detail: { status: ins.status, body: text.slice(0,500) } }
+      ),
     });
 
+    if (!ins.ok) return res.status(500).json({ error: "supabase insert error", status: ins.status, body: text.slice(0,200) });
+    return res.status(201).json(Array.isArray(data) ? data[0] : data);
   } catch (e) {
-    console.error('Error in create widget:', e);
-    return res.status(500).json({ 
-      ok: false, 
-      error: e?.message || String(e) 
-    });
+    return res.status(500).json({ error: e?.message || "unknown error" });
   }
 }
