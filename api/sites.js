@@ -1,4 +1,3 @@
-// api/sites.js
 export default async function handler(req, res) {
   try {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -14,33 +13,21 @@ export default async function handler(req, res) {
     const REST = `${root}/rest/v1`;
 
     const key = process.env.SUPABASE_SERVICE_ROLE;
-    if (!root || !key) {
-      return res.status(500).json({ error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE" });
-    }
-    const headers = {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      Accept: "application/json"
-    };
+    if (!root || !key) return res.status(500).json({ error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE" });
 
-    const url =
-      `${REST}/sites` +
-      `?customer_id=eq.${encodeURIComponent(customer_id)}` +
-      `&select=id,notion_database_id,created_at` +
-      `&order=created_at.desc`;
+    const headers = { apikey: key, Authorization: `Bearer ${key}`, Accept: "application/json" };
+    const url = `${REST}/sites?customer_id=eq.${encodeURIComponent(customer_id)}&select=id,notion_database_id,created_at&order=created_at.desc`;
 
     const r = await fetch(url, { headers, cache: "no-store" });
     const text = await r.text();
     const data = r.ok && text ? JSON.parse(text) : (r.ok ? [] : null);
 
-    // Log
     await fetch(`${REST}/logs`, {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify(
-        r.ok
-          ? { customer_id, event: "api-sites-ok",    detail: { count: Array.isArray(data) ? data.length : 0 } }
-          : { customer_id, event: "api-sites-error", detail: { status: r.status, body: text.slice(0, 500) } }
+        r.ok ? { customer_id, event: "api-sites-ok", detail: { count: Array.isArray(data) ? data.length : 0 } }
+            : { customer_id, event: "api-sites-error", detail: { status: r.status, body: text.slice(0, 500) } }
       ),
     });
 
