@@ -1,6 +1,17 @@
 {
   "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": true,
+
   "headers": [
+    {
+      "source": "/(setup|widget)/?",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" }
+      ]
+    },
     {
       "source": "/",
       "headers": [
@@ -8,51 +19,17 @@
         { "key": "Pragma", "value": "no-cache" },
         { "key": "Expires", "value": "0" }
       ]
-    },
-    {
-      "source": "/index.html",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
-        { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
-      ]
-    },
-    {
-      "source": "/setup",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
-        { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
-      ]
-    },
-    {
-      "source": "/setup/",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
-        { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
-      ]
-    },
-    {
-      "source": "/setup/:path*",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
-        { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
-      ]
     }
   ],
+
   "redirects": [
-    {
-      "source": "/setup",
-      "destination": "/setup/",
-      "permanent": false
-    }
+    { "source": "/setup", "destination": "/setup/", "permanent": false },
+    { "source": "/widget", "destination": "/widget/", "permanent": false }
   ],
+
   "rewrites": [
-    {
-      "source": "/widget",
-      "destination": "/widget/index.html"
-    }
+    { "source": "/", "destination": "/public/index.html" },
+    { "source": "/setup/", "destination": "/public/setup/index.html" },
+    { "source": "/widget/", "destination": "/public/widget/index.html" }
   ]
 }
