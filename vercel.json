@@ -1,25 +1,58 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "routes": [
-    { "src": "^/$", "dest": "/index.html" },
-    { "src": "^/setup/?$", "dest": "/setup/index.html" },
-    { "src": "^/help/?$", "dest": "/help/index.html" },
-    { "src": "^/account/?$", "dest": "/account/index.html" },
-    { "src": "^/widget/?$", "dest": "/widget/index.html" }
-  ],
+  "version": 2,
   "headers": [
     {
-      "source": "/(.*).html",
+      "source": "/",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store, max-age=0" }
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" }
       ]
     },
     {
-      "source": "/setup/(.*)",
+      "source": "/index.html",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store, max-age=0" }
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" }
       ]
+    },
+    {
+      "source": "/setup",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" }
+      ]
+    },
+    {
+      "source": "/setup/",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" }
+      ]
+    },
+    {
+      "source": "/setup/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/setup",
+      "destination": "/setup/",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/widget",
+      "destination": "/widget/index.html"
     }
   ]
 }
