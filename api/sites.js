@@ -1,15 +1,16 @@
-// api/sites.js — versión robusta contra /rest/v1 duplicado
+// api/sites.js
 export default async function handler(req, res) {
   try {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
     const { customer_id } = req.query;
     if (!customer_id || typeof customer_id !== "string") {
       return res.status(400).json({ error: "missing customer_id" });
     }
 
-    // Normaliza SUPABASE_URL: soporta con o sin /rest/v1 y con o sin /
     const baseRaw = process.env.SUPABASE_URL || "";
-    const baseNoSlash = baseRaw.replace(/\/+$/, "");             // quita slashes finales
-    const root = baseNoSlash.replace(/\/rest\/v1$/i, "");        // quita /rest/v1 si ya venía
+    const baseNoSlash = baseRaw.replace(/\/+$/, "");
+    const root = baseNoSlash.replace(/\/rest\/v1$/i, "");
     const REST = `${root}/rest/v1`;
 
     const key = process.env.SUPABASE_SERVICE_ROLE;
@@ -22,7 +23,6 @@ export default async function handler(req, res) {
       Accept: "application/json"
     };
 
-    // --- consulta sites ---
     const url =
       `${REST}/sites` +
       `?customer_id=eq.${encodeURIComponent(customer_id)}` +
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     const text = await r.text();
     const data = r.ok && text ? JSON.parse(text) : (r.ok ? [] : null);
 
-    // log en Supabase (ok/error)
+    // Log
     await fetch(`${REST}/logs`, {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },
