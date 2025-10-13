@@ -1,57 +1,32 @@
-export default async function handler(req, res) {
-  if (req.method === "OPTIONS") {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    return res.status(204).end();
-  }
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  if (req.method !== "POST") return res.status(405).json({ error: "method not allowed" });
-
-  try {
-    const { email } = req.body || {};
-    if (!email || typeof email !== "string") return res.status(400).json({ error: "missing email" });
-
-    const baseRaw = process.env.SUPABASE_URL || "";
-    const baseNoSlash = baseRaw.replace(/\/+$/, "");
-    const root = baseNoSlash.replace(/\/rest\/v1$/i, "");
-    const REST = `${root}/rest/v1`;
-
-    const key = process.env.SUPABASE_SERVICE_ROLE;
-    if (!root || !key) return res.status(500).json({ error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE" });
-
-    const headers = {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
-      Prefer: "return=representation,resolution=merge-duplicates"
-    };
-
-    const upsert = await fetch(`${REST}/customers?on_conflict=email`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ email })
-    });
-    const bodyText = await upsert.text();
-    if (!upsert.ok) return res.status(500).json({ error: "customers upsert error", status: upsert.status, body: bodyText.slice(0,500) });
-
-    const rows = bodyText ? JSON.parse(bodyText) : [];
-    const customer = Array.isArray(rows) ? rows[0] : rows;
-    const customer_id = customer?.id;
-    if (!customer_id) return res.status(500).json({ error: "no customer id returned" });
-
-    const proto = (req.headers["x-forwarded-proto"] || "https");
-    const host  = req.headers.host;
-    const link  = `${proto}://${host}/mi-cuenta.html?customer_id=${customer_id}`;
-
-    await fetch(`${REST}/logs`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ customer_id, event: "generate-link-ok", detail: { email } })
-    });
-
-    return res.status(200).json({ link, customer_id });
-  } catch (e) {
-    return res.status(500).json({ error: e?.message || "unknown error" });
-  }
-}
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Widget Setup (v2)</title>
+<style>
+ body{font-family:system-ui,sans-serif;margin:24px;max-width:720px}
+ form{display:grid;gap:12px;max-width:420px}
+ input,button{padding:10px 12px;border:1px solid #ddd;border-radius:8px}
+ button{cursor:pointer;background:#fff}
+ .result{margin-top:16px}.link{display:inline-block;margin-top:8px}
+ @media (max-width:375px){body{font-size:16px}}
+</style>
+</head><body>
+<h1>Widget Setup (v2)</h1>
+<p>Escribe tu email para generar tu Magic Link y entrar a tu cuenta.</p>
+<form id="f">
+  <input id="email" type="email" placeholder="tu-email@ejemplo.com" required />
+  <button type="submit">Generar link</button>
+</form>
+<div id="msg" class="result"></div>
+<script>
+ const f=document.getElementById("f"),msg=document.getElementById("msg");
+ f.addEventListener("submit",async(e)=>{e.preventDefault();msg.textContent="Generando…";
+  const email=document.getElementById("email").value.trim();
+  try{
+    const r=await fetch("/api/generate-link",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+    const data=await r.json();
+    if(!r.ok){msg.textContent="Error generando el link.";console.error(data);return;}
+    msg.innerHTML=`<div>Tu link está listo.</div><a class="link" href="${data.link}">Ir a mi cuenta</a>`;
+  }catch(err){msg.textContent="Error de red.";console.error(err);}
+ });
+</script>
+</body></html>
