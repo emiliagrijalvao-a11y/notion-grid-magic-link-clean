@@ -1,119 +1,116 @@
-export const config = { runtime: 'nodejs' };
+// /api/widgets/create.js
+// Crea un widget y devuelve la URL embebible.
+// Requiere que la tabla `public.widgets` tenga (al menos) estas columnas:
+// id (uuid, pk), notion_token (text), grid_db_url (text),
+// bio_db_url (text, nullable), content_db_url (text, nullable),
+// customer_id (text, nullable), email (text, nullable),
+// type (text), plan (text), config (jsonb), created_at, updated_at.
 
-const {
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE,
-  RESEND_API_KEY,
-  FROM_EMAIL,
-  BASE_URL,
-} = process.env;
-
-async function createWidgetInSupabase(payload) {
-  const url = `${SUPABASE_URL}/rest/v1/rpc/api_create_widget`;
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: {
-      apikey: SUPABASE_SERVICE_ROLE,
-      Authorization: `Bearer ${SUPABASE_SERVICE_ROLE}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=representation',
-    },
-    body: JSON.stringify({
-      p_email: payload.email || null,
-      p_plan: payload.plan || 'pro',
-      p_notion_token: payload.notionToken,
-      p_grid_db_url: payload.gridDbUrl,
-      p_bio_db_url: payload.bioDbUrl || null,
-    }),
-  });
-
-  if (!r.ok) {
-    const txt = await r.text().catch(() => null);
-    throw new Error(`Supabase RPC error: ${txt || r.status}`);
-  }
-
-  const data = await r.json();
-  const first = Array.isArray(data) ? data[0] : data;
-  if (!first || !first.widget_id) {
-    throw new Error('Respuesta RPC sin widget_id');
-  }
-  return first.widget_id;
-}
-
-async function sendEmail(to, widgetUrl) {
-  if (!to || !RESEND_API_KEY || !FROM_EMAIL) return;
-
-  const html = `
-  <div style="font-family:Inter,Arial,sans-serif;color:#000;background:#D9D9D9;padding:28px">
-    <div style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #ddd;padding:24px">
-      <h2 style="margin:0 0 12px 0;font-family:Oswald,Arial,sans-serif;letter-spacing:.5px">Tu widget está listo</h2>
-      <p style="margin:0 0 16px 0;line-height:1.6">
-        Copia y pega este enlace en tu Notion con <strong>/embed</strong>:
-      </p>
-      <p style="margin:12px 0 20px 0">
-        <a href="${widgetUrl}" style="display:inline-block;background:#000;color:#fff;padding:12px 18px;text-decoration:none">Ir al Setup del widget</a>
-      </p>
-      <div style="font-family:ui-monospace,monospace;font-size:13px;background:#f7f7f7;border:1px solid #eee;padding:10px;word-break:break-all">
-        ${widgetUrl}
-      </div>
-      <p style="margin-top:18px;font-size:13px;color:#333">
-        ¿Dudas? Escríbeme a <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a>.
-      </p>
-      <p style="margin-top:6px;font-size:12px;color:#666">© 2025 Flujo Creativo</p>
-    </div>
-  </div>`;
-
-  const r = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: FROM_EMAIL,
-      to,
-      subject: 'Tu widget de Instagram Grid está listo',
-      html,
-    }),
-  });
-
-  if (!r.ok) {
-    const err = await r.text().catch(() => null);
-    console.error('Resend error:', err || r.status);
-  }
-}
+import { supabase } from '../_supabase.js'; // ← ya existe en tu repo
 
 export default async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
-      return res.status(405).json({ success: false, error: 'Method Not Allowed' });
+      return res.status(405).json({ success: false, error: 'Método no permitido' });
     }
 
-    const { notionToken, gridDbUrl, bioDbUrl, email, plan } = req.body || {};
-    if (!notionToken || !gridDbUrl) {
+    // Node 20 ya trae fetch global: NO importes node-fetch.
+    const body = await readJson(req, res);
+    if (!body) return; // readJson ya respondió con 400 si falló
+
+    // Nombres EXACTOS que envía el setup (v2)
+    let {
+      notion_token,
+      grid_db_url,
+      bio_db_url,
+      content_db_url,
+      customer_id,
+      email,
+    } = body;
+
+    // Normaliza strings
+    notion_token   = coerceStr(notion_token);
+    grid_db_url    = coerceStr(grid_db_url);
+    bio_db_url     = coerceStr(bio_db_url, true);
+    content_db_url = coerceStr(content_db_url, true);
+    customer_id    = coerceStr(customer_id, true);
+    email          = coerceStr(email, true);
+
+    // Validación mínima
+    if (!notion_token || !grid_db_url) {
       return res.status(400).json({ success: false, error: 'Faltan campos' });
     }
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE || !BASE_URL) {
+
+    // Payload para la BD (valores por defecto coherentes con tu flujo)
+    const payload = {
+      notion_token,
+      grid_db_url,
+      bio_db_url:     bio_db_url || null,
+      content_db_url: content_db_url || null,
+      customer_id:    customer_id || null,
+      email:          email || null,
+      type: 'grid',
+      plan: 'pro',
+      config: {
+        version: 1,
+        sources: ['attachment', 'link', 'canva'],
+      },
+    };
+
+    // Inserta y devuelve el id
+    const { data, error } = await supabase
+      .from('widgets')
+      .insert([payload])
+      .select('id')
+      .single();
+
+    if (error) {
       return res
         .status(500)
-        .json({ success: false, error: 'Faltan variables de entorno en el servidor' });
+        .json({ success: false, error: `Supabase insert error: ${JSON.stringify(error)}` });
     }
 
-    const widgetId = await createWidgetInSupabase({
-      notionToken,
-      gridDbUrl,
-      bioDbUrl,
-      email,
-      plan,
+    const base =
+      (process.env.BASE_URL && process.env.BASE_URL.replace(/\/+$/, '')) ||
+      new URL(req.url, `https://${req.headers.host}`).origin;
+
+    // Tu widget público usa /widget/?id=XXXX
+    const widgetUrl = `${base}/widget/?id=${data.id}`;
+
+    return res.status(200).json({
+      success: true,
+      widgetId: data.id,
+      widgetUrl,
     });
-
-    const widgetUrl = `${BASE_URL.replace(/\/+$/, '')}/widget?id=${encodeURIComponent(widgetId)}`;
-
-    await sendEmail(email, widgetUrl);
-
-    return res.status(200).json({ success: true, widgetId, widgetUrl });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success: false, error: String(err.message || err) });
+    return res
+      .status(500)
+      .json({ success: false, error: `Unhandled error: ${String(err)}` });
+  }
+}
+
+// Helpers
+function coerceStr(v, allowEmpty = false) {
+  if (v == null) return '';
+  const s = String(v).trim();
+  return allowEmpty ? s : s || '';
+}
+
+async function readJson(req, res) {
+  try {
+    // Vercel Node.js API routes: req.body puede venir vacío si no hay bodyParser,
+    // por eso leemos el stream manualmente si hace falta.
+    if (req.body && typeof req.body === 'object') return req.body;
+    const chunks = [];
+    for await (const ch of req) chunks.push(ch);
+    const raw = Buffer.concat(chunks).toString('utf8');
+    if (!raw) {
+      res.status(400).json({ success: false, error: 'Body vacío' });
+      return null;
+    }
+    return JSON.parse(raw);
+  } catch {
+    res.status(400).json({ success: false, error: 'JSON inválido' });
+    return null;
   }
 }
