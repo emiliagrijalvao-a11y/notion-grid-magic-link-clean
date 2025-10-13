@@ -39,19 +39,9 @@
           body: JSON.stringify({ email })
         });
         const data = await r.json();
-        if (!r.ok) {
-          msg.textContent = "Error generando el link. Revisa el email.";
-          console.error(data);
-          return;
-        }
-        msg.innerHTML = `
-          <div>Tu link está listo.</div>
-          <a class="link" href="${data.link}">Ir a mi cuenta</a>
-        `;
-      } catch (err) {
-        msg.textContent = "Error de red. Intenta de nuevo.";
-        console.error(err);
-      }
+        if (!r.ok) { msg.textContent = "Error generando el link."; console.error(data); return; }
+        msg.innerHTML = `<div>Tu link está listo.</div><a class="link" href="${data.link}">Ir a mi cuenta</a>`;
+      } catch (err) { msg.textContent = "Error de red."; console.error(err); }
     });
   </script>
 </body>
