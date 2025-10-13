@@ -1,6 +1,6 @@
 <!doctype html><html lang="es"><head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Conecta tu Notion — Magic Link (v2)</title>
+<title>Widget Setup (v2)</title>
 <style>
  body{font-family:system-ui,sans-serif;margin:24px;max-width:720px}
  form{display:grid;gap:12px;max-width:420px}
@@ -12,8 +12,10 @@
 </head><body>
 <h1>Widget Setup (v2)</h1>
 <p>Escribe tu email para generar tu Magic Link y entrar a tu cuenta.</p>
-<form id="f"><input id="email" type="email" placeholder="tu-email@ejemplo.com" required />
-<button type="submit">Generar link</button></form>
+<form id="f">
+  <input id="email" type="email" placeholder="tu-email@ejemplo.com" required />
+  <button type="submit">Generar link</button>
+</form>
 <div id="msg" class="result"></div>
 <script>
  const f=document.getElementById("f"),msg=document.getElementById("msg");
