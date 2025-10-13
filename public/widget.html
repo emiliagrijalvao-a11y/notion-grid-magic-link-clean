@@ -14,12 +14,10 @@
 <body>
   <h1>Widget</h1>
   <div id="msg"></div>
-
   <script>
-    const p   = new URLSearchParams(location.search);
+    const p = new URLSearchParams(location.search);
     const wid = p.get("wid");
     const msg = document.getElementById("msg");
-
     if (!wid) {
       msg.textContent = "Falta ?wid= en la URL.";
     } else {
