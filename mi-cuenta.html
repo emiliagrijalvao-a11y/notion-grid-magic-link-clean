@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mis widgets</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; max-width: 720px; }
+    ul { list-style: none; padding: 0; display: grid; gap: 12px; }
+    li { border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px; }
+    @media (max-width: 375px) { body { font-size: 16px; } }
+  </style>
+</head>
+<body>
+  <h1>Mis widgets</h1>
+  <div id="msg"></div>
+  <ul id="list"></ul>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const cid = params.get("customer_id");
+    const msg = document.getElementById("msg");
+    const list = document.getElementById("list");
+
+    if (!cid) {
+      msg.textContent = "Agrega ?customer_id=UUID a la URL para ver tus widgets.";
+    } else {
+      msg.textContent = "Cargando…";
+      fetch(`/api/sites?customer_id=${encodeURIComponent(cid)}`)
+        .then(r => r.json())
+        .then(data => {
+          msg.textContent = "";
+          if (!Array.isArray(data) || data.length === 0) {
+            msg.textContent = "No tienes widgets creados aún. Crea uno desde tu Magic Link.";
+            return;
+          }
+          data.forEach(s => {
+            const li = document.createElement("li");
+            li.innerHTML = `<div><strong>DB:</strong> ${s.notion_database_id}</div>
+                            <div><strong>Creado:</strong> ${new Date(s.created_at).toLocaleString()}</div>`;
+            list.appendChild(li);
+          });
+        })
+        .catch(e => {
+          msg.textContent = "Error cargando datos";
+          console.error(e);
+        });
+    }
+  </script>
+</body>
+</html>
