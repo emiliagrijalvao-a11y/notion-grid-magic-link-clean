@@ -1,6 +1,4 @@
-// api/widgets/create.js
 export default async function handler(req, res) {
-  // CORS / preflight
   if (req.method === "OPTIONS") {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -8,15 +6,10 @@ export default async function handler(req, res) {
     return res.status(204).end();
   }
   res.setHeader("Access-Control-Allow-Origin", "*");
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "method not allowed" });
-  }
+  if (req.method !== "POST") return res.status(405).json({ error: "method not allowed" });
 
   const { notion_database_id, customer_id } = req.body || {};
-  if (!notion_database_id || !customer_id) {
-    return res.status(400).json({ error: "missing fields" });
-  }
+  if (!notion_database_id || !customer_id) return res.status(400).json({ error: "missing fields" });
 
   try {
     const baseRaw = process.env.SUPABASE_URL || "";
@@ -25,9 +18,8 @@ export default async function handler(req, res) {
     const REST = `${root}/rest/v1`;
 
     const key = process.env.SUPABASE_SERVICE_ROLE;
-    if (!root || !key) {
-      return res.status(500).json({ error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE" });
-    }
+    if (!root || !key) return res.status(500).json({ error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE" });
+
     const headers = {
       apikey: key,
       Authorization: `Bearer ${key}`,
@@ -43,20 +35,16 @@ export default async function handler(req, res) {
     const text = await ins.text();
     const data = ins.ok ? (text ? JSON.parse(text) : []) : null;
 
-    // Log
     await fetch(`${REST}/logs`, {
       method: "POST",
       headers,
       body: JSON.stringify(
-        ins.ok
-          ? { customer_id, event: "create-widget-ok",    detail: { notion_database_id } }
-          : { customer_id, event: "create-widget-error", detail: { status: ins.status, body: text.slice(0,500) } }
+        ins.ok ? { customer_id, event: "create-widget-ok",    detail: { notion_database_id } }
+               : { customer_id, event: "create-widget-error", detail: { status: ins.status, body: text.slice(0,500) } }
       ),
     });
 
-    if (!ins.ok) {
-      return res.status(500).json({ error: "supabase insert error", status: ins.status, body: text.slice(0,200) });
-    }
+    if (!ins.ok) return res.status(500).json({ error: "supabase insert error", status: ins.status, body: text.slice(0,200) });
     return res.status(201).json(Array.isArray(data) ? data[0] : data);
   } catch (e) {
     return res.status(500).json({ error: e?.message || "unknown error" });
