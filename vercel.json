@@ -3,7 +3,7 @@
   "trailingSlash": false,
   "routes": [
     { "src": "^/api/(.*)$", "dest": "/api/$1" },
-    { "src": "^/setup$",    "dest": "/setup/index.html" },
-    { "src": "^/setup/$",   "dest": "/setup/index.html" }
+    { "src": "^/setup$",    "dest": "/setup-v2/index.html" },
+    { "src": "^/setup/$",   "dest": "/setup-v2/index.html" }
   ]
 }
