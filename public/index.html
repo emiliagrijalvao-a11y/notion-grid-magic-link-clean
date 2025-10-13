@@ -1,291 +1,187 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Setup · Flujo Creativo</title>
-  <link rel="stylesheet" href="/styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sistema Notion Grid — Demo</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Oswald:wght@500;600&display=swap" rel="stylesheet" />
+
   <style>
-    /* mínimos seguros por si faltan en styles.css (no rompe tu tema) */
-    body{color:#111;background:#f7f7f7;font:16px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-    .wrap{max-width:980px;margin:32px auto;padding:0 16px}
-    header{display:flex;align-items:center;gap:16px;margin-bottom:12px}
-    .brand{font-family:Oswald,Inter,system-ui,sans-serif;font-weight:700;letter-spacing:.5px}
-    nav{display:flex;gap:12px;margin:12px 0 24px}
-    nav a{display:inline-block;padding:8px 14px;border:1px solid #000;background:#fff;color:#000;text-decoration:none}
-    nav a.active{background:#000;color:#fff}
-    .card{background:#fff;border:1px solid #000;padding:18px;margin:18px 0}
-    .field{display:block;margin:14px 0}
-    .field .label{font-weight:700;margin-bottom:6px}
-    .muted{opacity:.65;font-weight:400}
-    input[type="text"],input[type="email"],input[type="url"]{width:100%;padding:10px 12px;border:1px solid #000;background:#fff}
-    button.primary{background:#000;color:#fff;border:1px solid #000;padding:12px 18px;cursor:pointer}
-    details{margin:8px 0}
-    summary{cursor:pointer}
-    .alert{border:1px solid #000;background:#ECEBE8;padding:12px;margin:16px 0}
-    .ok{border-color:#0a0;background:#eaffea}
-    .err{border-color:#a00;background:#ffecec}
-    table.faq{width:100%;border-collapse:collapse}
-    .list{margin:0;padding-left:18px}
-    .small{font-size:13px}
+    :root{
+      --beige:#D9D9D9;   /* fondo */
+      --tile:#ECEBE8;    /* bloques/tiles */
+      --black:#000000;   /* texto/bordes */
+      --white:#ffffff;   /* tarjetas blancas si necesitas */
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:var(--black);
+      background:var(--beige);           /* SIN gradientes */
+      -webkit-font-smoothing:antialiased;
+      line-height:1.45;
+    }
+
+    .wrap{max-width:960px;margin:0 auto;padding:32px 18px 72px}
+
+    /* Cabecera editorial */
+    header{
+      display:flex;align-items:center;justify-content:space-between;
+      margin:6px 0 22px;
+    }
+    .brand{
+      font-family:Oswald,Inter,sans-serif;
+      font-size:22px;
+      letter-spacing:.5px;
+      text-transform:uppercase;
+    }
+    .status{
+      font-size:12px;
+      border:1px solid var(--black);
+      padding:4px 8px;
+      display:inline-block;
+    }
+
+    /* Hero minimal */
+    .hero{
+      border:1px solid var(--black);
+      background:var(--tile);           /* SIN gradientes */
+      padding:22px;
+      margin-bottom:18px;
+    }
+    h1{
+      font-family:Oswald,Inter,sans-serif;
+      font-weight:600;
+      font-size:28px;
+      margin:0 0 8px;
+      line-height:1.1;
+    }
+    p.lead{
+      margin:0 0 14px;
+      font-size:15px;
+    }
+
+    /* Botones */
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px}
+    .btn{
+      appearance:none;
+      display:inline-block;
+      text-decoration:none;
+      border:1px solid var(--black);
+      padding:10px 14px;
+      font-size:14px;
+      line-height:1;
+      background:var(--tile);
+      color:var(--black);
+      cursor:pointer;
+      border-radius:0;           /* bordes cuadrados */
+    }
+    .btn:hover{opacity:.9}
+    .btn-primary{
+      background:var(--black);
+      color:var(--white);
+    }
+
+    /* Grid de tarjetas informativas */
+    .grid{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:12px;
+    }
+    .card{
+      border:1px solid var(--black);
+      background:var(--white);         /* blanco editorial */
+      padding:14px;
+    }
+    .card strong{display:block;margin-bottom:6px}
+
+    /* Bloque “nota” */
+    .note{
+      border:1px solid var(--black);
+      background:var(--tile);
+      padding:12px;
+      margin-top:18px;
+      font-size:13px;
+    }
+    code{
+      font-family:ui-monospace,Menlo,Consolas,monospace;
+      background:var(--white);
+      border:1px solid var(--black);
+      padding:2px 6px;
+      font-size:12px;
+    }
+
+    /* Footer */
+    footer{
+      margin:28px 0 0;
+      display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+      font-size:12px;
+    }
+    .muted{opacity:.9}
+    a.link{color:var(--black);text-decoration:underline}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div class="brand">FLUJO CREATIVO</div>
+      <div class="brand">Flujo Creativo</div>
+      <span class="status">STATIC&nbsp;OK</span>
     </header>
 
-    <nav>
-      <a href="#start"   data-tab="start"   class="active">Empieza aquí</a>
-      <a href="#setup"   data-tab="setup">Setup</a>
-      <a href="#help"    data-tab="help">Help</a>
-      <a href="#account" data-tab="account">Account</a>
-    </nav>
+    <section class="hero">
+      <h1>Demo del Sistema Notion Grid</h1>
+      <p class="lead">Página de prueba para validar estáticos, endpoints y la UI base del grid.</p>
 
-    <!-- Empieza aquí (copia “buena” que querías conservar) -->
-    <section id="tab-start">
-      <h1>Planifica tu feed de Instagram trayendo tu Grid a Notion</h1>
-      <p>En pocos pasos tendrás una galería estilo Instagram que se actualiza automáticamente.</p>
+      <div class="actions">
+        <!-- herramientas técnicas (dejar visibles por ahora) -->
+        <a class="btn" href="/api/health">/api/health</a>
+        <a class="btn" href="/api/grid">/api/grid</a>
 
-      <h3>Sigue estos pasos:</h3>
-      <div class="card">
-        <p><strong>1. Prepara tu contenido en Notion</strong></p>
-        <p><strong>OPCIÓN 1: Usa nuestro template (recomendado)</strong><br>
-        Duplica el template para obtener una base de datos lista con imágenes de ejemplo en tu Notion. Asegúrate de que todo funcione correctamente antes de cambiar a tu propio sistema.</p>
-        <p><a href="https://www.notion.so/templates" target="_blank" rel="noopener">
-          <button class="primary">Duplicar template →</button></a></p>
+        <!-- CTA útiles -->
+        <a class="btn" href="/activate.html">Activar widget</a>
+        <a class="btn" href="/grid.html">Ver Grid (UI)</a>
 
-        <p><strong>OPCIÓN 2: Crea tu propia base de datos</strong><br>
-        Si prefieres empezar desde cero o modificar una base existente, asegúrate de que tenga estas propiedades básicas:</p>
+        <!-- Setup directo (no rompe nada si ya existe /setup/) -->
+        <a class="btn btn-primary" href="/setup/">Comenzar Setup del Grid →</a>
+      </div>
 
-        <table class="faq" border="1" cellpadding="8">
-          <thead><tr><th>Propiedad</th><th>Tipo</th><th>Propósito</th></tr></thead>
-          <tbody>
-            <tr><td>Name</td><td>Text</td><td>Se muestra al pasar sobre imágenes.</td></tr>
-            <tr><td>Publish Date</td><td>Date</td><td>Determina el orden cronológico.</td></tr>
-            <tr><td>Attachment</td><td>File</td><td>Imágenes/Vídeos locales (Basic y Pro).</td></tr>
-            <tr><td>Image Source</td><td>Select</td><td>Pro: <em>Attachment</em> / <em>Link</em> / <em>Canva Design</em>.</td></tr>
-            <tr><td>Link</td><td>Text</td><td>Pro: enlaces externos (imágenes/vídeos).</td></tr>
-            <tr><td>Canva Link</td><td>URL</td><td>Pro: enlace de “Embed” de Canva.</td></tr>
-          </tbody>
-        </table>
+      <div class="grid">
+        <div class="card">
+          <strong>/api/health</strong>
+          <p>Verifica variables de entorno y estado básico.</p>
+        </div>
+        <div class="card">
+          <strong>/api/grid</strong>
+          <p>Devuelve los posts desde tu base de Notion en JSON (o demo si no hay <code>NOTION_GRID_API_URL</code>).</p>
+        </div>
+        <div class="card">
+          <strong>Activar widget</strong>
+          <p>Formulario de prueba para generar un enlace de acceso (demo).</p>
+        </div>
+        <div class="card">
+          <strong>Ver Grid (UI)</strong>
+          <p>Interfaz visual del feed tipo Instagram que consume <code>/api/grid</code>.</p>
+        </div>
+      </div>
 
-        <p class="small"><strong>Importante:</strong> Copia la URL de la <em>base de datos real</em> (vista de página completa), no de una vista vinculada.</p>
+      <div class="note">
+        <strong>Nota rápida:</strong> Si antes “Ver Grid (UI)” te mostraba JSON, ya está corregido: ahora apunta a <code>/grid.html</code>.  
+        Si usas la versión por pestañas, entra directo a <code>/setup/</code>.
       </div>
     </section>
 
-    <!-- Setup (solo añadimos Bio + mandamos bio_db_url) -->
-    <section id="tab-setup" style="display:none">
-      <h1>Widget Setup</h1>
-
-      <div class="card">
-        <label class="field" for="email">
-          <div class="label">Correo <span class="muted">(para identificar tu cuenta)</span></div>
-          <input id="email" type="email" placeholder="tu-correo@ejemplo.com">
-        </label>
-
-        <label class="field" for="notionToken">
-          <div class="label">Notion Integration Token</div>
-          <input id="notionToken" type="text" placeholder="secret_xxxxx...">
-        </label>
-
-        <details class="help">
-          <summary>+ Instrucciones</summary>
-          <div class="help-body">
-            <ol class="list">
-              <li>Crea tu integración: <a href="https://www.notion.so/my-integrations" target="_blank" rel="noopener">Notion Integrations</a>.</li>
-              <li>Copia el token (“Internal Integration Token”).</li>
-              <li>En cada base (Grid y, si usas, Bio) haz <strong>••• → Connect to</strong> y selecciona tu integración.</li>
-            </ol>
-          </div>
-        </details>
-
-        <!-- Grid -->
-        <label class="field" for="gridDbUrl">
-          <div class="label">Database URL — Grid</div>
-          <input id="gridDbUrl" type="url" placeholder="https://www.notion.so/... (base de Grid)">
-        </label>
-
-        <details class="help">
-          <summary>+ Cómo obtener este enlace</summary>
-          <div class="help-body small">
-            Abre la base en vista de página completa y copia la URL del navegador. Evita vistas vinculadas.
-          </div>
-        </details>
-
-        <!-- Bio (nuevo, opcional) -->
-        <label class="field" for="bioDbUrl">
-          <div class="label">Database URL — Bio Settings <span class="muted">(opcional)</span></div>
-          <input id="bioDbUrl" type="url" placeholder="https://www.notion.so/... (base de Bio Settings)">
-        </label>
-
-        <details class="help">
-          <summary>+ Qué debe contener</summary>
-          <div class="help-body small">
-            Puedes usar el template de Bio o tu propia base. Si lo dejas vacío, el widget solo usará tu Grid.
-          </div>
-        </details>
-
-        <label class="field">
-          <input id="confirmIntegration" type="checkbox"> &nbsp;
-          <span>Sí, conecté la integración a mi(s) base(s) de Notion</span>
-        </label>
-
-        <button id="btnGenerate" class="primary">Generar Widget →</button>
-
-        <div id="result" class="alert" style="display:none;margin-top:14px"></div>
-      </div>
-    </section>
-
-    <!-- Help (FAQs “buenas”) -->
-    <section id="tab-help" style="display:none">
-      <h1>Preguntas Frecuentes</h1>
-
-      <details class="card">
-        <summary><strong>¿Cómo empiezo con el widget?</strong></summary>
-        <div class="small">
-          Ve a <em>Setup</em>, pega tu Integration Token y las URLs de las bases (Grid + Bio). Pulsa “Generar Widget”.
-          Copia la URL resultante y embébela en Notion con <code>/embed</code>.
-        </div>
-      </details>
-
-      <details class="card">
-        <summary><strong>¿Cómo configuro correctamente mi base de datos de Notion?</strong></summary>
-        <div class="small">
-          Tu base debe incluir: <strong>Name</strong> (Text), <strong>Publish Date</strong> (Date), <strong>Attachment</strong> (File).
-          Versión Pro: añade <strong>Image Source</strong> (Select), <strong>Link</strong> (Text) y <strong>Canva Link</strong> (URL).
-        </div>
-      </details>
-
-      <details class="card">
-        <summary><strong>¿Por qué el widget no puede acceder a mi base?</strong></summary>
-        <div class="small">
-          Asegúrate de copiar la URL de la base fuente (no una vista vinculada), de abrirla en vista de página completa y de haber conectado la integración a esa base.
-        </div>
-      </details>
-
-      <details class="card">
-        <summary><strong>¿Puedo usar este widget con una base existente?</strong></summary>
-        <div class="small">
-          Sí. Solo respeta los nombres y tipos de las propiedades especiales. Puedes mantener tus demás columnas.
-        </div>
-      </details>
-
-      <details class="card">
-        <summary><strong>¿Puedo renombrar columnas?</strong></summary>
-        <div class="small">
-          No. Las columnas especiales deben mantener sus nombres exactos para que el widget funcione.
-        </div>
-      </details>
-
-      <details class="card">
-        <summary><strong>¿Puedo usarlo para múltiples clientes?</strong></summary>
-        <div class="small">
-          Sí. Crea una base por cliente y repite el Setup. Cada widget tendrá su propia URL única.
-        </div>
-      </details>
-
-      <details class="card">
-        <summary><strong>¿Cómo incrusto diseños de Canva? (Pro)</strong></summary>
-        <div class="small">
-          En <em>Image Source</em> elige <em>Canva Design</em>, y pega en <em>Canva Link</em> el enlace de “Embed” desde Canva (no el URL del navegador).
-        </div>
-      </details>
-
-      <p class="small">Soporte: <a href="mailto:emiliagrijalvao@gmail.com">emiliagrijalvao@gmail.com</a></p>
-    </section>
-
-    <!-- Account (sin cambios funcionales) -->
-    <section id="tab-account" style="display:none">
-      <h1>Información de la cuenta</h1>
-      <div id="acctWarn" class="alert err">Falta el token en la URL. Usa el enlace de tu email.</div>
-
-      <div id="acctBox" class="card" style="display:none">
-        <table class="faq" border="1" cellpadding="8">
-          <tbody>
-            <tr><td>Email</td><td id="acctEmail">usuario@ejemplo.com</td></tr>
-            <tr><td>Nombre</td><td id="acctName">Nombre del Usuario</td></tr>
-            <tr><td>Tipo de cuenta</td><td id="acctPlan">Basic Account</td></tr>
-          </tbody>
-        </table>
-
-        <h3>Licencias</h3>
-        <div class="card small">Basic License Key<br>XXXX-XXXX-XXXX-XXXX</div>
-
-        <h3>Tus Widgets (0)</h3>
-        <div id="acctWidgets" class="small">—</div>
-      </div>
-    </section>
+    <footer>
+      <div class="muted">© 2025 Flujo Creativo · Sistema Notion Grid (demo UX)</div>
+      <div><a class="link" href="/grid.html">Abrir Grid ahora →</a></div>
+    </footer>
   </div>
-
-  <script>
-    // Tabs
-    const tabs = ["start","setup","help","account"];
-    function showTab(name){
-      tabs.forEach(t=>{
-        document.getElementById("tab-"+t)?.setAttribute("style", t===name? "":"display:none");
-        document.querySelector(`a[data-tab="${t}"]`)?.classList.toggle("active", t===name);
-      });
-      history.replaceState({}, "", name==="start"? "/setup/": `/setup/#${name}`);
-    }
-    document.querySelectorAll("nav a").forEach(a=>{
-      a.addEventListener("click", e=>{
-        e.preventDefault();
-        showTab(a.dataset.tab);
-      });
-    });
-    (function initTab(){
-      const h = location.hash.replace("#","");
-      showTab(tabs.includes(h)? h : "start");
-    })();
-
-    // Setup: generar widget
-    async function generateWidget(){
-      const email        = (document.getElementById('email')?.value || '').trim();
-      const notionToken  = (document.getElementById('notionToken')?.value || '').trim();
-      const gridDbUrl    = (document.getElementById('gridDbUrl')?.value || '').trim();
-      const bioDbUrl     = (document.getElementById('bioDbUrl')?.value || '').trim();
-      const confirmed    = document.getElementById('confirmIntegration')?.checked;
-
-      const box = document.getElementById('result');
-      const say = (msg, ok=false)=>{
-        box.style.display='block';
-        box.className = 'alert ' + (ok? 'ok':'err');
-        box.textContent = msg;
-      };
-
-      if(!confirmed){ say('Marca la casilla de confirmación de integración'); return; }
-      if(!notionToken || !gridDbUrl){ say('Faltan campos: token y/o URL de la base de Grid'); return; }
-
-      const payload = {
-        email: email || null,
-        notion_token: notionToken,
-        grid_db_url: gridDbUrl,
-        bio_db_url: bioDbUrl || null
-      };
-
-      try{
-        const res = await fetch('/api/widgets/create', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json().catch(()=> ({}));
-        if(!res.ok){ throw new Error(data?.error || JSON.stringify(data) || 'Server error'); }
-
-        // Espera que el API devuelva { ok: true, id: 'xxxxx' }
-        if(data?.id){
-          const url = `/widget?id=${encodeURIComponent(data.id)}`;
-          say(`¡Listo! Copia y pega esta URL en Notion con /embed: ${url}`, true);
-        }else{
-          say('Respuesta inesperada del servidor'); 
-        }
-      }catch(err){
-        say(`No se pudo generar el widget: ${String(err.message || err)}`);
-      }
-    }
-    document.getElementById('btnGenerate')?.addEventListener('click', generateWidget);
-  </script>
 </body>
 </html>
