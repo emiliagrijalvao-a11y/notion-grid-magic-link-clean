@@ -1,48 +1,28 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Conecta tu Notion — Magic Link</title>
-  <style>
-    body{font-family:system-ui,sans-serif;margin:24px;max-width:720px}
-    form{display:grid;gap:12px;max-width:420px}
-    input,button{padding:10px 12px;border:1px solid #ddd;border-radius:8px}
-    button{cursor:pointer;background:#fff}
-    .result{margin-top:16px}
-    .link{display:inline-block;margin-top:8px}
-    @media (max-width:375px){body{font-size:16px}}
-  </style>
-</head>
-<body>
-  <h1>Widget Setup</h1>
-  <p>Escribe tu email para generar tu Magic Link y entrar a tu cuenta.</p>
-
-  <form id="f">
-    <input id="email" type="email" placeholder="tu-email@ejemplo.com" required />
-    <button type="submit">Generar link</button>
-  </form>
-
-  <div id="msg" class="result"></div>
-
-  <script>
-    const f = document.getElementById("f");
-    const msg = document.getElementById("msg");
-    f.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      msg.textContent = "Generando…";
-      const email = document.getElementById("email").value.trim();
-      try {
-        const r = await fetch("/api/generate-link", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
-        });
-        const data = await r.json();
-        if (!r.ok) { msg.textContent = "Error generando el link."; console.error(data); return; }
-        msg.innerHTML = `<div>Tu link está listo.</div><a class="link" href="${data.link}">Ir a mi cuenta</a>`;
-      } catch (err) { msg.textContent = "Error de red."; console.error(err); }
-    });
-  </script>
-</body>
-</html>
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Conecta tu Notion — Magic Link</title>
+<style>
+ body{font-family:system-ui,sans-serif;margin:24px;max-width:720px}
+ form{display:grid;gap:12px;max-width:420px}
+ input,button{padding:10px 12px;border:1px solid #ddd;border-radius:8px}
+ button{cursor:pointer;background:#fff}
+ .result{margin-top:16px}.link{display:inline-block;margin-top:8px}
+ @media (max-width:375px){body{font-size:16px}}
+</style>
+</head><body>
+<h1>Widget Setup</h1>
+<p>Escribe tu email para generar tu Magic Link y entrar a tu cuenta.</p>
+<form id="f"><input id="email" type="email" placeholder="tu-email@ejemplo.com" required />
+<button type="submit">Generar link</button></form>
+<div id="msg" class="result"></div>
+<script>
+ const f=document.getElementById("f"),msg=document.getElementById("msg");
+ f.addEventListener("submit",async(e)=>{e.preventDefault();msg.textContent="Generando…";
+  const email=document.getElementById("email").value.trim();
+  try{const r=await fetch("/api/generate-link",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});
+    const data=await r.json(); if(!r.ok){msg.textContent="Error generando el link.";console.error(data);return;}
+    msg.innerHTML=`<div>Tu link está listo.</div><a class="link" href="${data.link}">Ir a mi cuenta</a>`;
+  }catch(err){msg.textContent="Error de red.";console.error(err);}
+ });
+</script>
+</body></html>
