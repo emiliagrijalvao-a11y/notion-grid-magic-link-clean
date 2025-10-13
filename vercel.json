@@ -2,31 +2,22 @@
   "version": 2,
   "cleanUrls": true,
   "trailingSlash": true,
-
   "headers": [
-    {
-      "source": "/(setup|widget)/?",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
-        { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
-      ]
-    },
-    {
-      "source": "/",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
-        { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
-      ]
-    }
+    { "source": "/(setup|widget)/?", "headers": [
+      { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
+      { "key": "Pragma", "value": "no-cache" },
+      { "key": "Expires", "value": "0" }
+    ]},
+    { "source": "/", "headers": [
+      { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
+      { "key": "Pragma", "value": "no-cache" },
+      { "key": "Expires", "value": "0" }
+    ]}
   ],
-
   "redirects": [
     { "source": "/setup", "destination": "/setup/", "permanent": false },
     { "source": "/widget", "destination": "/widget/", "permanent": false }
   ],
-
   "rewrites": [
     { "source": "/", "destination": "/public/index.html" },
     { "source": "/setup/", "destination": "/public/setup/index.html" },
