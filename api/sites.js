@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       method: "POST",
       headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify(
-        r.ok ? { customer_id, event: "api-sites-ok", detail: { count: Array.isArray(data) ? data.length : 0 } }
+        r.ok ? { customer_id, event: "api-sites-ok",    detail: { count: Array.isArray(data) ? data.length : 0 } }
             : { customer_id, event: "api-sites-error", detail: { status: r.status, body: text.slice(0, 500) } }
       ),
     });
