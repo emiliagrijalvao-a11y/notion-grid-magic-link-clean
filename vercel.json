@@ -1,12 +1,13 @@
 {
-  "headers": [
-    { "source": "/", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
-    { "source": "/index.html", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
-    { "source": "/setup", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
-    { "source": "/setup/", "headers": [{ "key": "Cache-Control", "value": "no-store" }] },
-    { "source": "/setup/(.*)", "headers": [{ "key": "Cache-Control", "value": "no-store" }] }
-  ],
+  "cleanUrls": true,
+  "trailingSlash": false,
   "redirects": [
-    { "source": "/setup.html", "destination": "/setup/", "permanent": true }
+    { "source": "/", "destination": "/setup/", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/setup",  "destination": "/public/setup/index.html" },
+    { "source": "/setup/", "destination": "/public/setup/index.html" },
+    { "source": "/widget",  "destination": "/public/widget/index.html" },
+    { "source": "/widget/", "destination": "/public/widget/index.html" }
   ]
 }
